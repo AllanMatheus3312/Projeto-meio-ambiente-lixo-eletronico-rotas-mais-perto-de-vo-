@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="no-referrer-when-downgrade">
+  <title>Lixo Eletrônico 2.0 - Londrina</title>
+  
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="hero-banner">
+    <div class="banner-container">
+      <span class="tag">CONSCIENTIZAÇÃO AMBIENTAL</span>
+      <h1>Lixo Eletrônico 2.0</h1>
+      
+      <p class="importance-text">
+        <strong>Por que não jogar no lixo reciclado comum?</strong><br>
+        Equipamentos eletrônicos possuem metais pesados (como chumbo, mercúrio e cádmio). Quando misturados ao lixo reciclável comum, contaminam o solo e os lençóis freáticos. O descarte deve ser feito <strong>exclusivamente nos Pontos de Coleta Eletrônica</strong>.
+      </p>
+
+      <div class="search-area">
+        <button id="btnGeo" type="button" class="btn-location">
+          <i class="fa-solid fa-location-crosshairs"></i> Encontrar Mais Próximo
+        </button>
+        <div class="search-input-wrapper">
+          <input type="text" id="searchInput" placeholder="Ou digite seu bairro/endereço..." />
+          <button id="btnSearch" type="button" class="btn-primary">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="info-section container">
+    <h2>Entenda o Descarte Correto</h2>
+    
+    <div class="info-grid">
+      <div class="info-card is-e-waste">
+        <h3><i class="fa-solid fa-circle-check"></i> O que É Lixo Eletrônico?</h3>
+        <ul>
+          <li>Computadores, notebooks, monitores e mouses</li>
+          <li>Celulares, tablets, carregadores e cabos</li>
+          <li>Televisores, rádios, consoles e fones</li>
+          <li>Pilhas, baterias portáteis e eletrodomésticos</li>
+        </ul>
+      </div>
+
+      <div class="info-card not-e-waste">
+        <h3><i class="fa-solid fa-circle-xmark"></i> O que NÃO É Lixo Eletrônico?</h3>
+        <ul>
+          <li>Lixo orgânico (restos de alimentos)</li>
+          <li>Embalagens de plástico, papelão e garrafas PET</li>
+          <li>Vidros, latas de alumínio e talheres</li>
+          <li>Lâmpadas fluorescentes, medicamentos e tintas</li>
+        </ul>
+      </div>
+    </div>
+
+        <img src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=600&q=80" 
+             alt="Ponto de Descarte de Eletrônicos" 
+             onerror="this.onerror=null; this.parentElement.classList.add('img-fallback'); this.remove();">
+        <span>Ponto de Coleta Específico</span>
+      </div>
+      <div class="photo-box">
+        <img src="https://images.unsplash.com/photo-1550009158-9ebf69173e03?auto=format&fit=crop&w=600&q=80" 
+             alt="Descarte de Equipamentos e Baterias" 
+             onerror="this.onerror=null; this.parentElement.classList.add('img-fallback'); this.remove();">
+        <span>Coleta de Equipamentos e Baterias</span>
+      </div>
+    </div>
+  </section>
+
+  <main class="results-section" id="resultsSection">
+    <div class="container">
+      <div id="statusMessage" class="status-box">
+        Exibindo todos os pontos de coleta de lixo eletrônico em Londrina.
+      </div>
+
+      <div class="layout-grid">
+        <div class="places-list" id="placesList">
+        </div>
+
+        <div class="map-wrapper">
+          <div id="map"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
