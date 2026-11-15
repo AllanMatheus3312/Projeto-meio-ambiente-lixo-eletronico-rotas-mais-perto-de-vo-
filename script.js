@@ -253,7 +253,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ================= LÓGICA DE COOKIES, PIX (R$ 30,00) E MURAL PÚBLICO PARA TODOS =================
 (function() {
-  const PIX_KEY = "allanmatheus571@gmail.com";
+  // Chave Pix Aleatória do Mercado Pago atualizada
+  const PIX_KEY = "254d5227-0a94-4950-9da0-c1ac36dac043";
   const PIX_AMOUNT = "30.00";
 
   // COLE AQUI AS CREDENCIAIS DO SEU PROJETO FIREBASE GRATUITO PARA COMPARTILHAR OS ANÚNCIOS COM TODOS:
@@ -385,7 +386,6 @@ document.addEventListener('DOMContentLoaded', () => {
       btnVerifyPix.disabled = true;
       btnVerifyPix.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Validando ID do Pix...';
 
-      // Impede reutilização do mesmo ID de comprovante no banco
       if (db) {
         const existing = await db.collection('anuncios_pagos').where('txId', '==', txId).get();
         if (!existing.empty) {
@@ -404,7 +404,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 800);
     });
 
-    // Renderiza os anúncios públicos para TODOS os visitantes
     const sponsorsGrid = document.getElementById('sponsorsGrid');
     function drawAdsCards(adsList) {
       sponsorsGrid.innerHTML = '';
@@ -428,7 +427,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function loadPublicSponsors() {
       if (db) {
-        // Escuta em tempo real todos os anúncios salvos na nuvem para todos os usuários verem
         db.collection('anuncios_pagos').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
           const publicAds = [];
           snapshot.forEach(doc => publicAds.push(doc.data()));
@@ -442,7 +440,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadPublicSponsors();
 
-    // Redimensiona a imagem antes de salvar para ficar leve no carregamento de todos os visitantes
     function compressImage(file, callback) {
       const reader = new FileReader();
       reader.onload = (event) => {
