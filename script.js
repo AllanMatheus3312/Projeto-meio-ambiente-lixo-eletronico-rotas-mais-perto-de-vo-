@@ -1,4 +1,3 @@
-// Pontos de descarte reais cadastrados em Londrina
 const eWastePlaces = [
   {
     id: 1,
@@ -48,7 +47,6 @@ let userMarker = null;
 let userLocation = null;
 let routingControl = null;
 
-// Cálculo da distância em km (Haversine)
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371;
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -61,7 +59,6 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
-// Função para desenhar a linha de rota azul no mapa até o destino escolhido
 function drawRouteToPlace(destLat, destLng, placeName) {
   const originLat = userLocation ? userLocation.lat : -23.3103;
   const originLng = userLocation ? userLocation.lng : -51.1592;
@@ -87,7 +84,7 @@ function drawRouteToPlace(destLat, destLng, placeName) {
   }).addTo(map);
 
   const statusMsg = document.getElementById('statusMessage');
-  const originLabel = userLocation ? "sua localização atual" : "o Centro de Londrina (clique em 'Encontrar Mais Próximo' para usar seu GPS)";
+  const originLabel = userLocation ? "sua localização atual" : "o Centro de Londrina";
   statusMsg.innerHTML = `<i class="fa-solid fa-route" style="color:#0284c7;"></i> Traçando rota de <strong>${originLabel}</strong> até <strong>${placeName}</strong>.`;
 }
 
@@ -208,7 +205,7 @@ function getUserLocation() {
       statusMsg.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#10b981;"></i> Rota traçada! O ponto mais próximo é <strong>${closest.name}</strong> (${closest.distance.toFixed(1)} km de você).`;
     },
     (error) => {
-      statusMsg.innerHTML = "Não foi possível obter sua localização. Por favor, permita o acesso à localização no navegador.";
+      statusMsg.innerHTML = "Não foi possível obter sua localização. Permita o acesso à localização.";
     }
   );
 }
@@ -238,7 +235,7 @@ function handleSearch() {
 
   plotMarkers(filtered);
   renderPlacesList(filtered);
-  statusMsg.innerHTML = `Encontrado(s) <strong>${filtered.length}</strong> ponto(s) para "<em>${query}</em>". Clique em um ponto para ver a rota.`;
+  statusMsg.innerHTML = `Encontrado(s) <strong>${filtered.length}</strong> ponto(s) para "<em>${query}</em>".`;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -251,13 +248,67 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// ================= LÓGICA DE COOKIES, PIX (R$ 30,00) E MURAL PÚBLICO PARA TODOS =================
-(function() {
-  // Chave Pix Aleatória do Mercado Pago atualizada
-  const PIX_KEY = "254d5227-0a94-4950-9da0-c1ac36dac043";
-  const PIX_AMOUNT = "30.00";
+const PIX_KEY = "allanmatheus571@gmail.com";
 
-  // COLE AQUI AS CREDENCIAIS DO SEU PROJETO FIREBASE GRATUITO PARA COMPARTILHAR OS ANÚNCIOS COM TODOS:
+window.openAdModalWithPrice = function(amount, planTitle) {
+  const adModal = document.getElementById('adPaymentModal');
+  const stepPix = document.getElementById('stepPixPayment');
+  const stepForm = document.getElementById('stepMarketingForm');
+  
+  document.getElementById('modalPlanBadge').innerText = `PLANO SELECIONADO • VALOR: R$ ${amount}`;
+  document.getElementById('modalPlanTitle').innerText = planTitle;
+
+  const payload = generatePixPayload(PIX_KEY, amount);
+  document.getElementById('pixPayloadInput').value = payload;
+  document.getElementById('pixQrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(payload)}`;
+
+  adModal.style.display = 'flex';
+  if (getCookie('pix_paid_unlocked') === 'true') {
+    stepPix.style.display = 'none';
+    stepForm.style.display = 'block';
+  } else {
+    stepPix.style.display = 'block';
+    stepForm.style.display = 'none';
+  }
+};
+
+function generatePixPayload(key, amount = "30.00", merchantName = "ALLAN MATHEUS", city = "LONDRINA") {
+  const formatField = (id, value) => id + String(value.length).padStart(2, '0') + value;
+  const merchantAccount = formatField("00", "br.gov.bcb.pix") + formatField("01", key);
+  let payload =
+    formatField("00", "01") +
+    formatField("26", merchantAccount) +
+    formatField("52", "0000") +
+    formatField("53", "986") +
+    formatField("54", amount) +
+    formatField("58", "BR") +
+    formatField("59", merchantName.substring(0, 25)) +
+    formatField("60", city.substring(0, 15)) +
+    formatField("62", formatField("05", "***")) +
+    "6304";
+
+  let crc = 0xFFFF;
+  for (let i = 0; i < payload.length; i++) {
+    crc ^= payload.charCodeAt(i) << 8;
+    for (let j = 0; j < 8; j++) {
+      crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1);
+    }
+  }
+  return payload + (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+}
+
+function setCookie(name, value, days) {
+  const d = new Date();
+  d.setTime(d.getTime() + (days * 86400000));
+  document.cookie = `${name}=${value};expires=${d.toUTCString()};path=/`;
+}
+
+function getCookie(name) {
+  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+  return match ? match[2] : null;
+}
+
+(function() {
   const firebaseConfig = {
     apiKey: "SUA_API_KEY_AQUI",
     authDomain: "SEU_PROJETO.firebaseapp.com",
@@ -268,42 +319,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeof firebase !== 'undefined' && firebaseConfig.apiKey !== "SUA_API_KEY_AQUI") {
     firebase.initializeApp(firebaseConfig);
     db = firebase.firestore();
-  }
-
-  function generatePixPayload(key, amount = "30.00", merchantName = "ALLAN MATHEUS", city = "LONDRINA") {
-    const formatField = (id, value) => id + String(value.length).padStart(2, '0') + value;
-    const merchantAccount = formatField("00", "br.gov.bcb.pix") + formatField("01", key);
-    let payload =
-      formatField("00", "01") +
-      formatField("26", merchantAccount) +
-      formatField("52", "0000") +
-      formatField("53", "986") +
-      formatField("54", amount) +
-      formatField("58", "BR") +
-      formatField("59", merchantName.substring(0, 25)) +
-      formatField("60", city.substring(0, 15)) +
-      formatField("62", formatField("05", "***")) +
-      "6304";
-
-    let crc = 0xFFFF;
-    for (let i = 0; i < payload.length; i++) {
-      crc ^= payload.charCodeAt(i) << 8;
-      for (let j = 0; j < 8; j++) {
-        crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1);
-      }
-    }
-    return payload + (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
-  }
-
-  function setCookie(name, value, days) {
-    const d = new Date();
-    d.setTime(d.getTime() + (days * 86400000));
-    document.cookie = `${name}=${value};expires=${d.toUTCString()};path=/`;
-  }
-
-  function getCookie(name) {
-    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-    return match ? match[2] : null;
   }
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -333,30 +348,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const adModal = document.getElementById('adPaymentModal');
-    const btnOpenAd = document.getElementById('btnOpenAdModal');
     const btnCloseAd = document.getElementById('btnCloseAdModal');
     const stepPix = document.getElementById('stepPixPayment');
     const stepForm = document.getElementById('stepMarketingForm');
-    const pixPayloadInput = document.getElementById('pixPayloadInput');
-    const pixQrImage = document.getElementById('pixQrImage');
     const txIdInput = document.getElementById('pixTxIdInput');
     const receiptInput = document.getElementById('pixReceiptInput');
     const btnVerifyPix = document.getElementById('btnVerifyPix');
-
-    const payload = generatePixPayload(PIX_KEY, PIX_AMOUNT);
-    pixPayloadInput.value = payload;
-    pixQrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(payload)}`;
-
-    btnOpenAd.addEventListener('click', () => {
-      adModal.style.display = 'flex';
-      if (getCookie('pix_paid_unlocked') === 'true') {
-        stepPix.style.display = 'none';
-        stepForm.style.display = 'block';
-      } else {
-        stepPix.style.display = 'block';
-        stepForm.style.display = 'none';
-      }
-    });
 
     btnCloseAd.addEventListener('click', () => {
       adModal.style.display = 'none';
@@ -368,8 +365,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('btnCopyPayload').addEventListener('click', () => {
+      const payload = document.getElementById('pixPayloadInput').value;
       navigator.clipboard.writeText(payload);
-      alert('Código Pix Copia e Cola (R$ 30,00) copiado!');
+      alert('Código Pix Copia e Cola copiado!');
     });
 
     function checkPixInputs() {

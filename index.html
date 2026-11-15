@@ -17,23 +17,23 @@
 </head>
 <body>
 
-  <!-- ================= AVISO 1: PRIVACIDADE E NÃO USO DE SGBD PESSOAL ================= -->
+  <!-- ================= AVISO 1: PRIVACIDADE E SGBD (EXIGÊNCIA DE LEI) ================= -->
   <div id="cookiePrivacyOverlay" class="custom-overlay">
     <div class="custom-modal">
       <div class="modal-icon"><i class="fa-solid fa-shield-halved"></i></div>
-      <h3>Aviso de Privacidade e Cookies</h3>
+      <h3>Aviso de Privacidade e Proteção de Dados (LGPD)</h3>
       <p>
-        Bem-vindo ao <strong>Lixo Eletrônico 2.0</strong>. Antes de continuar, informamos que <strong>não coletamos, não rastreamos e não armazenamos seus dados pessoais de navegação</strong>. Apenas os anúncios públicos de empresas patrocinadoras são exibidos no mural.
+        Bem-vindo ao <strong>Lixo Eletrônico 2.0</strong>. Informamos que <strong>não coletamos, não vendemos e não armazenamos seus dados pessoais em nenhum banco de dados (SGBD) de rastreamento</strong>. Os únicos dados salvos na nuvem pública são os anúncios de empresas parceiras que efetuaram o pagamento de patrocínio.
       </p>
       <button id="btnAcceptPrivacy" type="button" class="btn-modal-primary">Entendi e Continuar</button>
     </div>
   </div>
 
-  <!-- ================= AVISO 2: COOKIES DO PIX E ANÚNCIOS ================= -->
+  <!-- ================= AVISO 2: COOKIES DE SESSÃO ================= -->
   <div id="cookiePixBanner" class="cookie-bottom-bar" style="display: none;">
     <div class="cookie-bottom-content">
       <p>
-        <i class="fa-solid fa-cookie-bite"></i> <strong>Cookies de Divulgação e Pix:</strong> Utilizamos armazenamento local apenas para gerenciar sessões de patrocinadores e liberação de anúncios via Pix.
+        <i class="fa-solid fa-cookie-bite"></i> <strong>Cookies de Sessão:</strong> Utilizamos armazenamento local apenas para gerenciar sessões de patrocinadores e liberação de anúncios via Pix.
       </p>
       <button id="btnAcceptPixCookie" type="button" class="btn-modal-primary btn-sm">Aceitar Cookies</button>
     </div>
@@ -65,7 +65,7 @@
     </div>
   </header>
 
-  <!-- ================= BANNER DE DIVULGAÇÃO DE EMPRESAS ================= -->
+  <!-- ================= BANNER 2: PLANO INTERMEDIÁRIO (R$ 30,00 NO MEIO) ================= -->
   <section class="ads-section container">
     <div class="ads-cta-banner">
       <div class="ads-cta-text">
@@ -73,8 +73,8 @@
         <h3>Divulgue sua Empresa ou Trabalho Aqui!</h3>
         <p>Alcance moradores de Londrina engajados com sustentabilidade e tecnologia. Seu anúncio fica visível para todos os visitantes após o pagamento de R$ 30,00 via Pix.</p>
       </div>
-      <button id="btnOpenAdModal" type="button" class="btn-advertise">
-        <i class="fa-solid fa-rocket"></i> Anunciar Agora (R$ 30)
+      <button type="button" class="btn-advertise" onclick="openAdModalWithPrice('30.00', 'Plano Intermediário (R$ 30,00)')">
+        <i class="fa-solid fa-rocket"></i> Anunciar por R$ 30,00
       </button>
     </div>
 
@@ -144,6 +144,33 @@
     </div>
   </main>
 
+  <!-- ================= BANNER 1: PLANO BÁSICO (R$ 15,00 NO RODAPÉ/LÁ EMBAIXO) ================= -->
+  <section class="footer-ads-section container">
+    <div class="ads-cta-banner footer-banner-style">
+      <div class="ads-cta-text">
+        <span class="ads-badge" style="background:#0284c7; color:#fff;"><i class="fa-solid fa-tag"></i> PLANO ECONÔMICO • R$ 15,00</span>
+        <h3>Quer Divulgar com Menor Custo?</h3>
+        <p>Cadastre sua empresa no plano básico de R$ 15,00 e apareça também no mural de patrocínios da nossa página.</p>
+      </div>
+      <button type="button" class="btn-advertise" style="background:#0284c7; color:#fff;" onclick="openAdModalWithPrice('15.00', 'Plano Básico (R$ 15,00)')">
+        <i class="fa-solid fa-bolt"></i> Anunciar por R$ 15,00
+      </button>
+    </div>
+  </section>
+
+  <!-- ================= BANNER 3: PLANO VIP FLUTUANTE (R$ 70,00 ACOMPANHA A TELA) ================= -->
+  <div id="floatingVipBanner" class="floating-vip-banner">
+    <div class="floating-content">
+      <div class="floating-text">
+        <span class="ads-badge" style="background:#7c3aed; color:#fff;"><i class="fa-solid fa-crown"></i> PLANO VIP DESTAQUE • R$ 70,00</span>
+        <p>Destaque máximo no topo do mural para sua empresa!</p>
+      </div>
+      <button type="button" class="btn-advertise" style="background:#7c3aed; color:#fff; padding:8px 14px; font-size:0.9rem;" onclick="openAdModalWithPrice('70.00', 'Plano VIP Destaque (R$ 70,00)')">
+        <i class="fa-solid fa-star"></i> Destacar por R$ 70,00
+      </button>
+    </div>
+  </div>
+
   <!-- ================= MODAL DE PAGAMENTO PIX E UPLOAD DE MARKETING ================= -->
   <div id="adPaymentModal" class="custom-overlay" style="display: none;">
     <div class="custom-modal modal-lg">
@@ -151,20 +178,20 @@
 
       <!-- Etapa 1: Pagamento via Pix -->
       <div id="stepPixPayment">
-        <span class="ads-badge">PASSO 1 DE 2 • VALOR: R$ 30,00</span>
-        <h3>Libere seu Acesso via Pix</h3>
-        <p class="modal-subtitle">Escaneie o QR Code ou copie o código Pix de <strong>R$ 30,00</strong> abaixo. Após o pagamento, informe o ID da transação (E2E) e anexe o comprovante para liberar seu painel.</p>
+        <span class="ads-badge" id="modalPlanBadge">PASSO 1 DE 2</span>
+        <h3 id="modalPlanTitle">Libere seu Acesso via Pix</h3>
+        <p class="modal-subtitle">Escaneie o QR Code ou copie o código Pix abaixo para a chave <strong>allanmatheus571@gmail.com</strong>. Após o pagamento, informe o ID da transação e anexe o comprovante.</p>
 
         <div class="pix-box">
-          <img id="pixQrImage" src="" alt="QR Code Pix R$ 30,00" class="pix-qr" />
+          <img id="pixQrImage" src="" alt="QR Code Pix" class="pix-qr" />
           <div class="pix-details">
-            <label>Chave Pix (E-mail) — Valor R$ 30,00:</label>
+            <label>Sua Chave Pix (E-mail):</label>
             <div class="pix-copy-row">
               <input type="text" id="pixKeyInput" value="allanmatheus571@gmail.com" readonly />
               <button type="button" id="btnCopyPixKey" class="btn-copy"><i class="fa-regular fa-copy"></i> Copiar Chave</button>
             </div>
 
-            <label style="margin-top: 10px; display: block;">Código Pix Copia e Cola (Já com R$ 30,00):</label>
+            <label style="margin-top: 10px; display: block;">Código Pix Copia e Cola:</label>
             <div class="pix-copy-row">
               <input type="text" id="pixPayloadInput" readonly />
               <button type="button" id="btnCopyPayload" class="btn-copy"><i class="fa-regular fa-copy"></i> Copiar Código</button>
@@ -179,7 +206,7 @@
           <input type="text" id="pixTxIdInput" placeholder="Ex: E123456782026..." style="width:100%; padding:8px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;" />
 
           <label for="pixReceiptInput" class="receipt-label">
-            <i class="fa-solid fa-receipt"></i> Anexe o comprovante do Pix (R$ 30,00):
+            <i class="fa-solid fa-receipt"></i> Anexe o comprovante do Pix:
           </label>
           <input type="file" id="pixReceiptInput" accept="image/*,.pdf" />
           <button type="button" id="btnVerifyPix" class="btn-modal-primary" style="width: 100%; margin-top: 12px;" disabled>
@@ -188,7 +215,7 @@
         </div>
       </div>
 
-      <!-- Etapa 2: Formulário de Divulgação (Liberado automaticamente após o Pix) -->
+      <!-- Etapa 2: Formulário de Divulgação -->
       <div id="stepMarketingForm" style="display: none;">
         <span class="ads-badge" style="background:#10b981; color:#fff;">ACESSO LIBERADO • PASSO 2 DE 2</span>
         <h3>Cadastre sua Empresa ou Trabalho</h3>
@@ -217,9 +244,5 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <!-- Leaflet Routing Machine JS -->
   <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
-  <!-- Firebase SDK (Nuvem gratuita para que todos vejam os anúncios publicados) -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="script.js"></script>
-</body>
-</html>
+  <!-- Firebase SDK -->
+  <script src="

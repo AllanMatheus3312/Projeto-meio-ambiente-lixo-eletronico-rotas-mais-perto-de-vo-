@@ -196,7 +196,6 @@ body {
   font-size: 0.85rem;
 }
 
-/* Fallback caso a imagem falhe */
 .photo-box.img-fallback {
   background: linear-gradient(135deg, #10b981, #059669);
   display: flex;
@@ -215,7 +214,7 @@ body {
 
 /* Resultados e Mapa */
 .results-section {
-  padding-bottom: 50px;
+  padding-bottom: 30px;
 }
 
 .status-box {
@@ -310,7 +309,6 @@ body {
   height: 100%;
 }
 
-/* Ajuste visual para a caixa de instruções de rota no mapa */
 .leaflet-routing-container {
   max-height: 180px;
   overflow-y: auto;
@@ -320,7 +318,7 @@ body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
 }
 
-/* ================= ESTILOS DE COOKIES, BANNER DE DIVULGAÇÃO E PIX ================= */
+/* Modais e Banners */
 .custom-overlay {
   position: fixed;
   inset: 0;
@@ -432,6 +430,10 @@ body {
   margin-top: 30px;
 }
 
+.footer-ads-section {
+  margin: 30px auto 50px auto;
+}
+
 .ads-cta-banner {
   background: linear-gradient(135deg, #1e293b, #0f172a);
   color: #ffffff;
@@ -444,6 +446,10 @@ body {
   gap: 20px;
   border-left: 6px solid #f59e0b;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.footer-banner-style {
+  border-left: 6px solid #0284c7;
 }
 
 .ads-badge {
@@ -481,11 +487,39 @@ body {
   align-items: center;
   gap: 8px;
   transition: transform 0.15s, background 0.2s;
+  white-space: nowrap;
 }
 
 .btn-advertise:hover {
-  background: #fbbf24;
   transform: translateY(-2px);
+}
+
+/* Banner VIP Flutuante (Acompanha a rolagem sem estresar o usuário) */
+.floating-vip-banner {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #1e1b4b, #312e81);
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  z-index: 999;
+  border: 2px solid #7c3aed;
+  max-width: 340px;
+  transition: opacity 0.3s ease;
+}
+
+.floating-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.floating-text p {
+  font-size: 0.8rem;
+  color: #e2e8f0;
+  margin: 0;
 }
 
 .sponsors-grid {
