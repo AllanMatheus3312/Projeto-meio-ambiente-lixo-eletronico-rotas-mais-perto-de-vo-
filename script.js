@@ -238,16 +238,6 @@ function handleSearch() {
   statusMsg.innerHTML = `Encontrado(s) <strong>${filtered.length}</strong> ponto(s) para "<em>${query}</em>".`;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  initMap();
-
-  document.getElementById('btnGeo').addEventListener('click', getUserLocation);
-  document.getElementById('btnSearch').addEventListener('click', handleSearch);
-  document.getElementById('searchInput').addEventListener('keyup', (e) => {
-    if (e.key === 'Enter') handleSearch();
-  });
-});
-
 const PIX_KEY = "allanmatheus571@gmail.com";
 
 window.openAdModalWithPrice = function(amount, planTitle) {
@@ -308,7 +298,50 @@ function getCookie(name) {
   return match ? match[2] : null;
 }
 
-(function() {
+// Inicializador Único e Seguro após o carregamento da página
+document.addEventListener('DOMContentLoaded', () => {
+  initMap();
+
+  document.getElementById('btnGeo').addEventListener('click', getUserLocation);
+  document.getElementById('btnSearch').addEventListener('click', handleSearch);
+  document.getElementById('searchInput').addEventListener('keyup', (e) => {
+    if (e.key === 'Enter') handleSearch();
+  });
+
+  // --- GERENCIAMENTO DE COOKIES E LGPD ---
+  const privacyOverlay = document.getElementById('cookiePrivacyOverlay');
+  const pixCookieBanner = document.getElementById('cookiePixBanner');
+  const btnAcceptPrivacy = document.getElementById('btnAcceptPrivacy');
+  const btnAcceptPixCookie = document.getElementById('btnAcceptPixCookie');
+
+  // Verifica estado inicial dos cookies
+  if (getCookie('privacy_no_sgbd_accepted') === 'true') {
+    if (privacyOverlay) privacyOverlay.style.display = 'none';
+    if (getCookie('pix_ads_cookie_accepted') !== 'true') {
+      if (pixCookieBanner) pixCookieBanner.style.display = 'block';
+    }
+  } else {
+    if (privacyOverlay) privacyOverlay.style.display = 'flex';
+  }
+
+  if (btnAcceptPrivacy) {
+    btnAcceptPrivacy.onclick = function() {
+      setCookie('privacy_no_sgbd_accepted', 'true', 365);
+      if (privacyOverlay) privacyOverlay.style.display = 'none';
+      if (getCookie('pix_ads_cookie_accepted') !== 'true') {
+        if (pixCookieBanner) pixCookieBanner.style.display = 'block';
+      }
+    };
+  }
+
+  if (btnAcceptPixCookie) {
+    btnAcceptPixCookie.onclick = function() {
+      setCookie('pix_ads_cookie_accepted', 'true', 365);
+      if (pixCookieBanner) pixCookieBanner.style.display = 'none';
+    };
+  }
+
+  // --- MODAL DE ANÚNCIOS E FIREBASE ---
   const firebaseConfig = {
     apiKey: "SUA_API_KEY_AQUI",
     authDomain: "SEU_PROJETO.firebaseapp.com",
@@ -321,64 +354,48 @@ function getCookie(name) {
     db = firebase.firestore();
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const privacyOverlay = document.getElementById('cookiePrivacyOverlay');
-    const pixCookieBanner = document.getElementById('cookiePixBanner');
-    const btnAcceptPrivacy = document.getElementById('btnAcceptPrivacy');
-    const btnAcceptPixCookie = document.getElementById('btnAcceptPixCookie');
+  const adModal = document.getElementById('adPaymentModal');
+  const btnCloseAd = document.getElementById('btnCloseAdModal');
+  const stepPix = document.getElementById('stepPixPayment');
+  const stepForm = document.getElementById('stepMarketingForm');
+  const txIdInput = document.getElementById('pixTxIdInput');
+  const receiptInput = document.getElementById('pixReceiptInput');
+  const btnVerifyPix = document.getElementById('btnVerifyPix');
 
-    if (getCookie('privacy_no_sgbd_accepted') === 'true') {
-      privacyOverlay.style.display = 'none';
-      if (getCookie('pix_ads_cookie_accepted') !== 'true') {
-        pixCookieBanner.style.display = 'block';
-      }
-    }
-
-    btnAcceptPrivacy.addEventListener('click', () => {
-      setCookie('privacy_no_sgbd_accepted', 'true', 365);
-      privacyOverlay.style.display = 'none';
-      if (getCookie('pix_ads_cookie_accepted') !== 'true') {
-        pixCookieBanner.style.display = 'block';
-      }
-    });
-
-    btnAcceptPixCookie.addEventListener('click', () => {
-      setCookie('pix_ads_cookie_accepted', 'true', 365);
-      pixCookieBanner.style.display = 'none';
-    });
-
-    const adModal = document.getElementById('adPaymentModal');
-    const btnCloseAd = document.getElementById('btnCloseAdModal');
-    const stepPix = document.getElementById('stepPixPayment');
-    const stepForm = document.getElementById('stepMarketingForm');
-    const txIdInput = document.getElementById('pixTxIdInput');
-    const receiptInput = document.getElementById('pixReceiptInput');
-    const btnVerifyPix = document.getElementById('btnVerifyPix');
-
+  if (btnCloseAd) {
     btnCloseAd.addEventListener('click', () => {
       adModal.style.display = 'none';
     });
+  }
 
-    document.getElementById('btnCopyPixKey').addEventListener('click', () => {
+  const btnCopyKey = document.getElementById('btnCopyPixKey');
+  if (btnCopyKey) {
+    btnCopyKey.addEventListener('click', () => {
       navigator.clipboard.writeText(PIX_KEY);
       alert('Chave Pix copiada: ' + PIX_KEY);
     });
+  }
 
-    document.getElementById('btnCopyPayload').addEventListener('click', () => {
+  const btnCopyPayload = document.getElementById('btnCopyPayload');
+  if (btnCopyPayload) {
+    btnCopyPayload.addEventListener('click', () => {
       const payload = document.getElementById('pixPayloadInput').value;
       navigator.clipboard.writeText(payload);
       alert('Código Pix Copia e Cola copiado!');
     });
+  }
 
-    function checkPixInputs() {
-      const hasReceipt = receiptInput.files.length > 0;
-      const hasValidTxId = txIdInput.value.trim().length >= 10;
-      btnVerifyPix.disabled = !(hasReceipt && hasValidTxId);
-    }
+  function checkPixInputs() {
+    if (!receiptInput || !txIdInput || !btnVerifyPix) return;
+    const hasReceipt = receiptInput.files.length > 0;
+    const hasValidTxId = txIdInput.value.trim().length >= 10;
+    btnVerifyPix.disabled = !(hasReceipt && hasValidTxId);
+  }
 
-    receiptInput.addEventListener('change', checkPixInputs);
-    txIdInput.addEventListener('input', checkPixInputs);
+  if (receiptInput) receiptInput.addEventListener('change', checkPixInputs);
+  if (txIdInput) txIdInput.addEventListener('input', checkPixInputs);
 
+  if (btnVerifyPix) {
     btnVerifyPix.addEventListener('click', async () => {
       const txId = txIdInput.value.trim();
       btnVerifyPix.disabled = true;
@@ -401,63 +418,67 @@ function getCookie(name) {
         stepForm.style.display = 'block';
       }, 800);
     });
+  }
 
-    const sponsorsGrid = document.getElementById('sponsorsGrid');
-    function drawAdsCards(adsList) {
-      sponsorsGrid.innerHTML = '';
-      adsList.forEach(ad => {
-        const card = document.createElement('div');
-        card.className = 'sponsor-card';
-        card.innerHTML = `
-          ${ad.image ? `<img src="${ad.image}" alt="${ad.name}">` : ''}
-          <div class="sponsor-card-body">
-            <span class="sponsor-cat">${ad.category} • Patrocinado</span>
-            <h4>${ad.name}</h4>
-            <p>${ad.desc}</p>
-            <a href="${ad.link}" target="_blank" rel="noopener noreferrer" class="sponsor-link">
-              Conhecer Empresa / Contato <i class="fa-solid fa-arrow-up-right-from-square"></i>
-            </a>
-          </div>
-        `;
-        sponsorsGrid.appendChild(card);
+  const sponsorsGrid = document.getElementById('sponsorsGrid');
+  function drawAdsCards(adsList) {
+    if (!sponsorsGrid) return;
+    sponsorsGrid.innerHTML = '';
+    adsList.forEach(ad => {
+      const card = document.createElement('div');
+      card.className = 'sponsor-card';
+      card.innerHTML = `
+        ${ad.image ? `<img src="${ad.image}" alt="${ad.name}">` : ''}
+        <div class="sponsor-card-body">
+          <span class="sponsor-cat">${ad.category} • Patrocinado</span>
+          <h4>${ad.name}</h4>
+          <p>${ad.desc}</p>
+          <a href="${ad.link}" target="_blank" rel="noopener noreferrer" class="sponsor-link">
+            Conhecer Empresa / Contato <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+        </div>
+      `;
+      sponsorsGrid.appendChild(card);
+    });
+  }
+
+  function loadPublicSponsors() {
+    if (db) {
+      db.collection('anuncios_pagos').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+        const publicAds = [];
+        snapshot.forEach(doc => publicAds.push(doc.data()));
+        drawAdsCards(publicAds);
       });
+    } else {
+      const localAds = JSON.parse(localStorage.getItem('lixo_eletronico_ads') || '[]');
+      drawAdsCards(localAds);
     }
+  }
 
-    function loadPublicSponsors() {
-      if (db) {
-        db.collection('anuncios_pagos').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
-          const publicAds = [];
-          snapshot.forEach(doc => publicAds.push(doc.data()));
-          drawAdsCards(publicAds);
-        });
-      } else {
-        const localAds = JSON.parse(localStorage.getItem('lixo_eletronico_ads') || '[]');
-        drawAdsCards(localAds);
-      }
-    }
+  loadPublicSponsors();
 
-    loadPublicSponsors();
-
-    function compressImage(file, callback) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 600;
-          const scale = MAX_WIDTH / img.width;
-          canvas.width = img.width > MAX_WIDTH ? MAX_WIDTH : img.width;
-          canvas.height = img.width > MAX_WIDTH ? img.height * scale : img.height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          callback(canvas.toDataURL('image/jpeg', 0.75));
-        };
-        img.src = event.target.result;
+  function compressImage(file, callback) {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 600;
+        const scale = MAX_WIDTH / img.width;
+        canvas.width = img.width > MAX_WIDTH ? MAX_WIDTH : img.width;
+        canvas.height = img.width > MAX_WIDTH ? img.height * scale : img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        callback(canvas.toDataURL('image/jpeg', 0.75));
       };
-      reader.readAsDataURL(file);
-    }
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
 
-    document.getElementById('marketingForm').addEventListener('submit', (e) => {
+  const marketingForm = document.getElementById('marketingForm');
+  if (marketingForm) {
+    marketingForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const btnPublish = document.getElementById('btnPublishAd');
       btnPublish.disabled = true;
@@ -508,5 +529,5 @@ function getCookie(name) {
         saveAd(null);
       }
     });
-  });
-})();
+  }
+});
