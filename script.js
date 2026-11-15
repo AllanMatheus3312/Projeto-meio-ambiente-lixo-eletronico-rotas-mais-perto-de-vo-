@@ -63,7 +63,6 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 
 // Função para desenhar a linha de rota azul no mapa até o destino escolhido
 function drawRouteToPlace(destLat, destLng, placeName) {
-  // Se o usuário ainda não clicou em "Encontrar Mais Próximo", usa o centro de Londrina como ponto de partida
   const originLat = userLocation ? userLocation.lat : -23.3103;
   const originLng = userLocation ? userLocation.lng : -51.1592;
 
@@ -81,7 +80,7 @@ function drawRouteToPlace(destLat, destLng, placeName) {
     draggableWaypoints: false,
     fitSelectedRoutes: true,
     showAlternatives: false,
-    createMarker: function() { return null; }, // Mantém os seus pinos originais
+    createMarker: function() { return null; },
     lineOptions: {
       styles: [{ color: '#0284c7', opacity: 0.9, weight: 6 }]
     }
@@ -95,7 +94,6 @@ function drawRouteToPlace(destLat, destLng, placeName) {
 function initMap() {
   map = L.map('map').setView([-23.3103, -51.1592], 12);
 
-  // Provedor CartoDB Voyager para evitar erro 403 Forbidden
   L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
     subdomains: 'abcd',
@@ -168,7 +166,6 @@ function renderPlacesList(places) {
   });
 }
 
-// Obtém a localização do usuário e calcula o ponto mais próximo
 function getUserLocation() {
   const statusMsg = document.getElementById('statusMessage');
 
@@ -185,7 +182,6 @@ function getUserLocation() {
       const lng = position.coords.longitude;
       userLocation = { lat, lng };
 
-      // Adiciona o pino azul no mapa onde o usuário está
       if (userMarker) {
         userMarker.setLatLng([lat, lng]);
       } else {
@@ -199,7 +195,6 @@ function getUserLocation() {
         userMarker.bindPopup("<b>Você está aqui!</b>").openPopup();
       }
 
-      // Ordena os pontos pelo mais próximo
       const sortedPlaces = eWastePlaces.map(place => {
         const dist = calculateDistance(lat, lng, place.lat, place.lng);
         return { ...place, distance: dist };
@@ -209,7 +204,6 @@ function getUserLocation() {
       renderPlacesList(sortedPlaces);
 
       const closest = sortedPlaces[0];
-      // Traça automaticamente a linha de rota azul até o ponto mais próximo
       drawRouteToPlace(closest.lat, closest.lng, closest.name);
       statusMsg.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#10b981;"></i> Rota traçada! O ponto mais próximo é <strong>${closest.name}</strong> (${closest.distance.toFixed(1)} km de você).`;
     },
@@ -257,12 +251,24 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// ================= LÓGICA DE COOKIES, PIX (R$ 30,00) E DIVULGAÇÃO =================
+// ================= LÓGICA DE COOKIES, PIX (R$ 30,00) E MURAL PÚBLICO PARA TODOS =================
 (function() {
   const PIX_KEY = "allanmatheus571@gmail.com";
   const PIX_AMOUNT = "30.00";
 
-  // Gera payload BRCode oficial para Pix estático com valor fixo de R$ 30,00
+  // COLE AQUI AS CREDENCIAIS DO SEU PROJETO FIREBASE GRATUITO PARA COMPARTILHAR OS ANÚNCIOS COM TODOS:
+  const firebaseConfig = {
+    apiKey: "SUA_API_KEY_AQUI",
+    authDomain: "SEU_PROJETO.firebaseapp.com",
+    projectId: "SEU_PROJECT_ID_AQUI"
+  };
+
+  let db = null;
+  if (typeof firebase !== 'undefined' && firebaseConfig.apiKey !== "SUA_API_KEY_AQUI") {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+  }
+
   function generatePixPayload(key, amount = "30.00", merchantName = "ALLAN MATHEUS", city = "LONDRINA") {
     const formatField = (id, value) => id + String(value.length).padStart(2, '0') + value;
     const merchantAccount = formatField("00", "br.gov.bcb.pix") + formatField("01", key);
@@ -278,7 +284,6 @@ document.addEventListener('DOMContentLoaded', () => {
       formatField("62", formatField("05", "***")) +
       "6304";
 
-    // Cálculo CRC16-CCITT
     let crc = 0xFFFF;
     for (let i = 0; i < payload.length; i++) {
       crc ^= payload.charCodeAt(i) << 8;
@@ -306,7 +311,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnAcceptPrivacy = document.getElementById('btnAcceptPrivacy');
     const btnAcceptPixCookie = document.getElementById('btnAcceptPixCookie');
 
-    // Controle dos dois avisos de cookies em sequência
     if (getCookie('privacy_no_sgbd_accepted') === 'true') {
       privacyOverlay.style.display = 'none';
       if (getCookie('pix_ads_cookie_accepted') !== 'true') {
@@ -327,7 +331,6 @@ document.addEventListener('DOMContentLoaded', () => {
       pixCookieBanner.style.display = 'none';
     });
 
-    // Configuração do Modal Pix e Divulgação
     const adModal = document.getElementById('adPaymentModal');
     const btnOpenAd = document.getElementById('btnOpenAdModal');
     const btnCloseAd = document.getElementById('btnCloseAdModal');
@@ -335,6 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const stepForm = document.getElementById('stepMarketingForm');
     const pixPayloadInput = document.getElementById('pixPayloadInput');
     const pixQrImage = document.getElementById('pixQrImage');
+    const txIdInput = document.getElementById('pixTxIdInput');
     const receiptInput = document.getElementById('pixReceiptInput');
     const btnVerifyPix = document.getElementById('btnVerifyPix');
 
@@ -367,24 +371,44 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('Código Pix Copia e Cola (R$ 30,00) copiado!');
     });
 
-    receiptInput.addEventListener('change', () => {
-      btnVerifyPix.disabled = !receiptInput.files.length;
-    });
+    function checkPixInputs() {
+      const hasReceipt = receiptInput.files.length > 0;
+      const hasValidTxId = txIdInput.value.trim().length >= 10;
+      btnVerifyPix.disabled = !(hasReceipt && hasValidTxId);
+    }
 
-    btnVerifyPix.addEventListener('click', () => {
-      btnVerifyPix.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verificando Pix...';
+    receiptInput.addEventListener('change', checkPixInputs);
+    txIdInput.addEventListener('input', checkPixInputs);
+
+    btnVerifyPix.addEventListener('click', async () => {
+      const txId = txIdInput.value.trim();
+      btnVerifyPix.disabled = true;
+      btnVerifyPix.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Validando ID do Pix...';
+
+      // Impede reutilização do mesmo ID de comprovante no banco
+      if (db) {
+        const existing = await db.collection('anuncios_pagos').where('txId', '==', txId).get();
+        if (!existing.empty) {
+          alert('Este ID de transação Pix já foi utilizado anteriormente.');
+          btnVerifyPix.innerHTML = '<i class="fa-solid fa-unlock"></i> Confirmar Pix e Liberar Divulgação';
+          btnVerifyPix.disabled = false;
+          return;
+        }
+      }
+
       setTimeout(() => {
         setCookie('pix_paid_unlocked', 'true', 7);
+        sessionStorage.setItem('current_pix_txid', txId);
         stepPix.style.display = 'none';
         stepForm.style.display = 'block';
       }, 800);
     });
 
+    // Renderiza os anúncios públicos para TODOS os visitantes
     const sponsorsGrid = document.getElementById('sponsorsGrid');
-    function renderSponsors() {
-      const saved = JSON.parse(localStorage.getItem('lixo_eletronico_ads') || '[]');
+    function drawAdsCards(adsList) {
       sponsorsGrid.innerHTML = '';
-      saved.forEach(ad => {
+      adsList.forEach(ad => {
         const card = document.createElement('div');
         card.className = 'sponsor-card';
         card.innerHTML = `
@@ -402,33 +426,89 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    renderSponsors();
+    function loadPublicSponsors() {
+      if (db) {
+        // Escuta em tempo real todos os anúncios salvos na nuvem para todos os usuários verem
+        db.collection('anuncios_pagos').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+          const publicAds = [];
+          snapshot.forEach(doc => publicAds.push(doc.data()));
+          drawAdsCards(publicAds);
+        });
+      } else {
+        const localAds = JSON.parse(localStorage.getItem('lixo_eletronico_ads') || '[]');
+        drawAdsCards(localAds);
+      }
+    }
+
+    loadPublicSponsors();
+
+    // Redimensiona a imagem antes de salvar para ficar leve no carregamento de todos os visitantes
+    function compressImage(file, callback) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 600;
+          const scale = MAX_WIDTH / img.width;
+          canvas.width = img.width > MAX_WIDTH ? MAX_WIDTH : img.width;
+          canvas.height = img.width > MAX_WIDTH ? img.height * scale : img.height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          callback(canvas.toDataURL('image/jpeg', 0.75));
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
 
     document.getElementById('marketingForm').addEventListener('submit', (e) => {
       e.preventDefault();
+      const btnPublish = document.getElementById('btnPublishAd');
+      btnPublish.disabled = true;
+      btnPublish.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Publicando para todos...';
+
       const name = document.getElementById('bizName').value.trim();
       const category = document.getElementById('bizCategory').value.trim();
       const desc = document.getElementById('bizDesc').value.trim();
       const link = document.getElementById('bizLink').value.trim();
+      const txId = sessionStorage.getItem('current_pix_txid') || 'PIX-' + Date.now();
       const imgFile = document.getElementById('bizImage').files[0];
 
-      const saveAd = (imgData) => {
-        const currentAds = JSON.parse(localStorage.getItem('lixo_eletronico_ads') || '[]');
-        currentAds.unshift({ name, category, desc, link, image: imgData });
-        localStorage.setItem('lixo_eletronico_ads', JSON.stringify(currentAds));
+      const saveAd = async (imgData) => {
+        const adData = {
+          name,
+          category,
+          desc,
+          link,
+          image: imgData,
+          txId,
+          createdAt: Date.now()
+        };
+
+        if (db) {
+          await db.collection('anuncios_pagos').add(adData);
+        } else {
+          const currentAds = JSON.parse(localStorage.getItem('lixo_eletronico_ads') || '[]');
+          currentAds.unshift(adData);
+          localStorage.setItem('lixo_eletronico_ads', JSON.stringify(currentAds));
+          loadPublicSponsors();
+        }
+
         setCookie('pix_paid_unlocked', 'false', -1);
+        sessionStorage.removeItem('current_pix_txid');
         e.target.reset();
+        txIdInput.value = '';
         receiptInput.value = '';
         btnVerifyPix.disabled = true;
         btnVerifyPix.innerHTML = '<i class="fa-solid fa-unlock"></i> Confirmar Pix e Liberar Divulgação';
+        btnPublish.disabled = false;
+        btnPublish.innerHTML = '<i class="fa-solid fa-check"></i> Publicar Anúncio para Todos';
         adModal.style.display = 'none';
-        renderSponsors();
       };
 
       if (imgFile) {
-        const reader = new FileReader();
-        reader.onload = () => saveAd(reader.result);
-        reader.readAsDataURL(imgFile);
+        compressImage(imgFile, saveAd);
       } else {
         saveAd(null);
       }
