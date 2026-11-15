@@ -6,14 +6,40 @@
   <meta name="referrer" content="no-referrer-when-downgrade">
   <title>Lixo Eletrônico 2.0 - Londrina</title>
   
+  <!-- Leaflet CSS (Mapa Interativo) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
+  <!-- Leaflet Routing Machine CSS (Rotas no Mapa) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+  <!-- Font Awesome para Ícones -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+  <!-- ================= AVISO 1: PRIVACIDADE E NÃO USO DE SGBD ================= -->
+  <div id="cookiePrivacyOverlay" class="custom-overlay">
+    <div class="custom-modal">
+      <div class="modal-icon"><i class="fa-solid fa-shield-halved"></i></div>
+      <h3>Aviso de Privacidade e Cookies</h3>
+      <p>
+        Bem-vindo ao <strong>Lixo Eletrônico 2.0</strong>. Antes de continuar, informamos que <strong>não coletamos, não rastreamos e não armazenamos seus dados pessoais em nenhum banco de dados (SGBD)</strong>. Toda a navegação e localização ocorrem apenas localmente no seu navegador.
+      </p>
+      <button id="btnAcceptPrivacy" type="button" class="btn-modal-primary">Entendi e Continuar</button>
+    </div>
+  </div>
+
+  <!-- ================= AVISO 2: COOKIES DO PIX E ANÚNCIOS ================= -->
+  <div id="cookiePixBanner" class="cookie-bottom-bar" style="display: none;">
+    <div class="cookie-bottom-content">
+      <p>
+        <i class="fa-solid fa-cookie-bite"></i> <strong>Cookies de Divulgação e Pix:</strong> Utilizamos armazenamento local apenas para gerenciar sessões de patrocinadores e liberação de anúncios via Pix.
+      </p>
+      <button id="btnAcceptPixCookie" type="button" class="btn-modal-primary btn-sm">Aceitar Cookies</button>
+    </div>
+  </div>
+
+  <!-- Banner Principal -->
   <header class="hero-banner">
     <div class="banner-container">
       <span class="tag">CONSCIENTIZAÇÃO AMBIENTAL</span>
@@ -24,6 +50,7 @@
         Equipamentos eletrônicos possuem metais pesados (como chumbo, mercúrio e cádmio). Quando misturados ao lixo reciclável comum, contaminam o solo e os lençóis freáticos. O descarte deve ser feito <strong>exclusivamente nos Pontos de Coleta Eletrônica</strong>.
       </p>
 
+      <!-- Área de Localização e Busca -->
       <div class="search-area">
         <button id="btnGeo" type="button" class="btn-location">
           <i class="fa-solid fa-location-crosshairs"></i> Encontrar Mais Próximo
@@ -38,6 +65,24 @@
     </div>
   </header>
 
+  <!-- ================= BANNER DE DIVULGAÇÃO DE EMPRESAS ================= -->
+  <section class="ads-section container">
+    <div class="ads-cta-banner">
+      <div class="ads-cta-text">
+        <span class="ads-badge"><i class="fa-solid fa-bullhorn"></i> ESPAÇO PATROCINADO • R$ 30,00</span>
+        <h3>Divulgue sua Empresa ou Trabalho Aqui!</h3>
+        <p>Alcance moradores de Londrina engajados com sustentabilidade e tecnologia. Liberação imediata após pagamento de R$ 30,00 via Pix.</p>
+      </div>
+      <button id="btnOpenAdModal" type="button" class="btn-advertise">
+        <i class="fa-solid fa-rocket"></i> Anunciar Agora (R$ 30)
+      </button>
+    </div>
+
+    <!-- Mural onde aparecem as empresas divulgadas -->
+    <div id="sponsorsGrid" class="sponsors-grid"></div>
+  </section>
+
+  <!-- Seção Informativa -->
   <section class="info-section container">
     <h2>Entenda o Descarte Correto</h2>
     
@@ -63,6 +108,9 @@
       </div>
     </div>
 
+    <!-- Imagens de Lixeiras e Pontos de Descarte com Tratamento de Erro -->
+    <div class="photos-container">
+      <div class="photo-box">
         <img src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=600&q=80" 
              alt="Ponto de Descarte de Eletrônicos" 
              onerror="this.onerror=null; this.parentElement.classList.add('img-fallback'); this.remove();">
@@ -77,14 +125,16 @@
     </div>
   </section>
 
+  <!-- Seção do Mapa e Resultados -->
   <main class="results-section" id="resultsSection">
     <div class="container">
       <div id="statusMessage" class="status-box">
-        Exibindo todos os pontos de coleta de lixo eletrônico em Londrina.
+        Exibindo todos os pontos de coleta de lixo eletrônico em Londrina. Clique em <strong>"Encontrar Mais Próximo"</strong> para traçar a rota no mapa.
       </div>
 
       <div class="layout-grid">
         <div class="places-list" id="placesList">
+          <!-- Preenchido via JS -->
         </div>
 
         <div class="map-wrapper">
@@ -94,7 +144,74 @@
     </div>
   </main>
 
+  <!-- ================= MODAL DE PAGAMENTO PIX E UPLOAD DE MARKETING ================= -->
+  <div id="adPaymentModal" class="custom-overlay" style="display: none;">
+    <div class="custom-modal modal-lg">
+      <button id="btnCloseAdModal" type="button" class="btn-close-modal">&times;</button>
+
+      <!-- Etapa 1: Pagamento via Pix -->
+      <div id="stepPixPayment">
+        <span class="ads-badge">PASSO 1 DE 2 • VALOR: R$ 30,00</span>
+        <h3>Libere seu Acesso via Pix</h3>
+        <p class="modal-subtitle">Escaneie o QR Code ou copie o código Pix de <strong>R$ 30,00</strong> abaixo. Assim que concluir, anexe o comprovante para liberar seu painel automaticamente.</p>
+
+        <div class="pix-box">
+          <img id="pixQrImage" src="" alt="QR Code Pix R$ 30,00" class="pix-qr" />
+          <div class="pix-details">
+            <label>Chave Pix (E-mail) — Valor R$ 30,00:</label>
+            <div class="pix-copy-row">
+              <input type="text" id="pixKeyInput" value="allanmatheus571@gmail.com" readonly />
+              <button type="button" id="btnCopyPixKey" class="btn-copy"><i class="fa-regular fa-copy"></i> Copiar Chave</button>
+            </div>
+
+            <label style="margin-top: 10px; display: block;">Código Pix Copia e Cola (Já com R$ 30,00):</label>
+            <div class="pix-copy-row">
+              <input type="text" id="pixPayloadInput" readonly />
+              <button type="button" id="btnCopyPayload" class="btn-copy"><i class="fa-regular fa-copy"></i> Copiar Código</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="pix-confirm-area">
+          <label for="pixReceiptInput" class="receipt-label">
+            <i class="fa-solid fa-receipt"></i> Anexe o comprovante do Pix (R$ 30,00) para liberar o painel:
+          </label>
+          <input type="file" id="pixReceiptInput" accept="image/*,.pdf" />
+          <button type="button" id="btnVerifyPix" class="btn-modal-primary" style="width: 100%; margin-top: 12px;" disabled>
+            <i class="fa-solid fa-unlock"></i> Confirmar Pix e Liberar Divulgação
+          </button>
+        </div>
+      </div>
+
+      <!-- Etapa 2: Formulário de Divulgação (Liberado automaticamente após o Pix) -->
+      <div id="stepMarketingForm" style="display: none;">
+        <span class="ads-badge" style="background:#10b981; color:#fff;">ACESSO LIBERADO • PASSO 2 DE 2</span>
+        <h3>Cadastre sua Empresa ou Trabalho</h3>
+        <p class="modal-subtitle">Preencha os dados abaixo para publicar seu marketing imediatamente no site.</p>
+
+        <form id="marketingForm" class="marketing-form">
+          <input type="text" id="bizName" placeholder="Nome da Empresa ou Profissional *" required />
+          <input type="text" id="bizCategory" placeholder="Área de atuação (Ex: Assistência Técnica, Loja, Serviços) *" required />
+          <textarea id="bizDesc" rows="3" placeholder="Descreva seu trabalho, produtos ou promoções *" required></textarea>
+          <input type="url" id="bizLink" placeholder="Link do WhatsApp, Instagram ou Site (https://...) *" required />
+          
+          <label class="file-upload-label">
+            <i class="fa-solid fa-image"></i> Imagem / Banner da Empresa (opcional):
+            <input type="file" id="bizImage" accept="image/*" />
+          </label>
+
+          <button type="submit" class="btn-modal-primary" style="width: 100%;">
+            <i class="fa-solid fa-check"></i> Publicar Anúncio Agora
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Leaflet Routing Machine JS (Traça a rota estilo GPS no mapa) -->
+  <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
