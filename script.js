@@ -238,8 +238,7 @@ function handleSearch() {
   statusMsg.innerHTML = `Encontrado(s) <strong>${filtered.length}</strong> ponto(s) para "<em>${query}</em>".`;
 }
 
-// Chave Pix por E-mail
-const PIX_KEY = "allanmatheus571@gmail.com";
+const PIX_KEY = "SUA_CHAVE_PIX_AQUI";
 
 window.openAdModalWithPrice = function(amount, planTitle) {
   const adModal = document.getElementById('adPaymentModal');
@@ -263,7 +262,7 @@ window.openAdModalWithPrice = function(amount, planTitle) {
   }
 };
 
-function generatePixPayload(key, amount = "30.00", merchantName = "ALLAN MATHEUS", city = "LONDRINA") {
+function generatePixPayload(key, amount = "30.00", merchantName = "ANUNCIANTE", city = "LONDRINA") {
   const formatField = (id, value) => id + String(value.length).padStart(2, '0') + value;
   const merchantAccount = formatField("00", "br.gov.bcb.pix") + formatField("01", key);
   let payload =
@@ -299,8 +298,72 @@ function getCookie(name) {
   return match ? match[2] : null;
 }
 
-// Inicializador principal da página
 document.addEventListener('DOMContentLoaded', () => {
+  if (localStorage.getItem('lgpd_aceito') !== 'true') {
+    const overlay = document.createElement('div');
+    overlay.id = 'jsCookieBox';
+    overlay.style.cssText = `
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.85);
+      z-index: 2147483647;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    `;
+
+    const box = document.createElement('div');
+    box.style.cssText = `
+      background: #ffffff;
+      max-width: 480px;
+      width: 100%;
+      padding: 28px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+    `;
+
+    box.innerHTML = `
+      <div style="font-size: 2.5rem; color: #047857; margin-bottom: 12px;">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <h3 style="color: #0f172a; margin-bottom: 10px; font-size: 1.35rem; font-family: sans-serif;">Aviso de Privacidade e Proteção de Dados</h3>
+      <p style="font-size: 0.95rem; color: #475569; margin-bottom: 20px; font-family: sans-serif; line-height: 1.5;">
+        Aviso de Cookies e Privacidade: este site opera sem banco de dados (SGBD) de rastreamento de usuários.
+      </p>
+      <button id="btnJsAceitar" type="button" style="
+        background: #047857;
+        color: #fff;
+        border: none;
+        padding: 14px 24px;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 1rem;
+        cursor: pointer;
+        width: 100%;
+      ">Entendi e Continuar</button>
+    `;
+
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    const apagarCaixa = function(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+      }
+      localStorage.setItem('lgpd_aceito', 'true');
+      overlay.remove();
+    };
+
+    const btnAceitar = document.getElementById('btnJsAceitar');
+    btnAceitar.addEventListener('click', apagarCaixa);
+    btnAceitar.addEventListener('touchend', apagarCaixa);
+    btnAceitar.addEventListener('pointerdown', apagarCaixa);
+  }
+
   initMap();
 
   document.getElementById('btnGeo').addEventListener('click', getUserLocation);
@@ -309,52 +372,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter') handleSearch();
   });
 
-  // --- GERENCIAMENTO DO AVISO DE PRIVACIDADE E COOKIES ---
-  const privacyOverlay = document.getElementById('cookiePrivacyOverlay');
-  const pixCookieBanner = document.getElementById('cookiePixBanner');
-  const btnAcceptPrivacy = document.getElementById('btnAcceptPrivacy');
-  const btnAcceptPixCookie = document.getElementById('btnAcceptPixCookie');
-
-  // Verifica se já aceitou a privacidade anteriormente
-  if (getCookie('privacy_no_sgbd_accepted') === 'true') {
-    if (privacyOverlay) privacyOverlay.style.display = 'none';
-    if (getCookie('pix_ads_cookie_accepted') !== 'true') {
-      if (pixCookieBanner) pixCookieBanner.style.display = 'block';
-    }
-  } else {
-    if (privacyOverlay) privacyOverlay.style.display = 'flex';
-  }
-
-  // Ação instantânea do botão de aceitar (Funciona perfeitamente em PC e Celular)
-  if (btnAcceptPrivacy) {
-    const aceitarPrivacidade = function(e) {
-      if (e) e.preventDefault();
-      setCookie('privacy_no_sgbd_accepted', 'true', 1); // Dura 1 dia (ou altere para 365 se quiser)
-      if (privacyOverlay) {
-        privacyOverlay.style.display = 'none';
-        privacyOverlay.remove();
-      }
-      if (getCookie('pix_ads_cookie_accepted') !== 'true') {
-        if (pixCookieBanner) pixCookieBanner.style.display = 'block';
-      }
-    };
-
-    btnAcceptPrivacy.addEventListener('click', aceitarPrivacidade);
-    btnAcceptPrivacy.addEventListener('touchend', aceitarPrivacidade);
-  }
-
-  if (btnAcceptPixCookie) {
-    const aceitarCookiesPix = function(e) {
-      if (e) e.preventDefault();
-      setCookie('pix_ads_cookie_accepted', 'true', 365);
-      if (pixCookieBanner) pixCookieBanner.style.display = 'none';
-    };
-
-    btnAcceptPixCookie.addEventListener('click', aceitarCookiesPix);
-    btnAcceptPixCookie.addEventListener('touchend', aceitarCookiesPix);
-  }
-
-  // --- MODAL E FIREBASE DE ANÚNCIOS ---
   const firebaseConfig = {
     apiKey: "SUA_API_KEY_AQUI",
     authDomain: "SEU_PROJETO.firebaseapp.com",
@@ -502,7 +519,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const desc = document.getElementById('bizDesc').value.trim();
       const link = document.getElementById('bizLink').value.trim();
       const txId = sessionStorage.getItem('current_pix_txid') || 'PIX-' + Date.now();
-      const imgFile = document.getElementById('bizImage').files[0];
+      const imgFile = document.getElementById('bizImage').files.length > 0 ? document.getElementById('bizImage').files[0] : null;
 
       const saveAd = async (imgData) => {
         const adData = {

@@ -17,7 +17,6 @@ body {
   padding: 0 20px;
 }
 
-/* Banner */
 .hero-banner {
   background: linear-gradient(135deg, #064e3b, #047857);
   color: #ffffff;
@@ -52,7 +51,6 @@ body {
   margin-bottom: 25px;
 }
 
-/* Área de Busca e Geolocalização */
 .search-area {
   display: flex;
   flex-wrap: wrap;
@@ -107,7 +105,6 @@ body {
   background-color: #059669;
 }
 
-/* Seção Informativa */
 .info-section {
   margin: 40px auto;
 }
@@ -161,7 +158,6 @@ body {
   font-weight: bold;
 }
 
-/* Container de Fotos */
 .photos-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -212,7 +208,6 @@ body {
   opacity: 0.5;
 }
 
-/* Resultados e Mapa */
 .results-section {
   padding-bottom: 30px;
 }
@@ -318,7 +313,6 @@ body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
 }
 
-/* Modais e Banners */
 .custom-overlay {
   position: fixed;
   inset: 0;
@@ -346,12 +340,6 @@ body {
   text-align: left;
   max-height: 90vh;
   overflow-y: auto;
-}
-
-.modal-icon {
-  font-size: 2.5rem;
-  color: #047857;
-  margin-bottom: 12px;
 }
 
 .custom-modal h3 {
@@ -398,34 +386,6 @@ body {
   cursor: pointer;
 }
 
-.cookie-bottom-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: #0f172a;
-  color: #f8fafc;
-  padding: 14px 20px;
-  z-index: 9998;
-  box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
-}
-
-.cookie-bottom-content {
-  max-width: 1100px;
-  margin: 0 auto;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  font-size: 0.9rem;
-}
-
-.btn-sm {
-  padding: 8px 16px;
-  font-size: 0.85rem;
-}
-
 .ads-section {
   margin-top: 30px;
 }
@@ -470,7 +430,7 @@ body {
 
 .ads-cta-text p {
   font-size: 0.9rem;
-  color: #cbd5e1;
+  color: #e2e8f0;
   max-width: 650px;
 }
 
@@ -494,7 +454,6 @@ body {
   transform: translateY(-2px);
 }
 
-/* Banner VIP Flutuante (Acompanha a rolagem sem estresar o usuário) */
 .floating-vip-banner {
   position: fixed;
   bottom: 20px;
@@ -507,7 +466,6 @@ body {
   z-index: 999;
   border: 2px solid #7c3aed;
   max-width: 340px;
-  transition: opacity 0.3s ease;
 }
 
 .floating-content {
