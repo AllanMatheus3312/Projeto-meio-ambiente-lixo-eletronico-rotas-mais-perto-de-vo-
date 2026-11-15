@@ -238,6 +238,7 @@ function handleSearch() {
   statusMsg.innerHTML = `Encontrado(s) <strong>${filtered.length}</strong> ponto(s) para "<em>${query}</em>".`;
 }
 
+// Chave Pix por E-mail
 const PIX_KEY = "allanmatheus571@gmail.com";
 
 window.openAdModalWithPrice = function(amount, planTitle) {
@@ -289,7 +290,7 @@ function generatePixPayload(key, amount = "30.00", merchantName = "ALLAN MATHEUS
 
 function setCookie(name, value, days) {
   const d = new Date();
-  d.setTime(d.getTime() + (days * 86400000));
+  d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
   document.cookie = `${name}=${value};expires=${d.toUTCString()};path=/`;
 }
 
@@ -298,7 +299,7 @@ function getCookie(name) {
   return match ? match[2] : null;
 }
 
-// Inicializador Único e Seguro após o carregamento da página
+// Inicializador principal da página
 document.addEventListener('DOMContentLoaded', () => {
   initMap();
 
@@ -308,13 +309,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter') handleSearch();
   });
 
-  // --- GERENCIAMENTO DE COOKIES E LGPD ---
+  // --- GERENCIAMENTO DO AVISO DE PRIVACIDADE E COOKIES ---
   const privacyOverlay = document.getElementById('cookiePrivacyOverlay');
   const pixCookieBanner = document.getElementById('cookiePixBanner');
   const btnAcceptPrivacy = document.getElementById('btnAcceptPrivacy');
   const btnAcceptPixCookie = document.getElementById('btnAcceptPixCookie');
 
-  // Verifica estado inicial dos cookies
+  // Verifica se já aceitou a privacidade anteriormente
   if (getCookie('privacy_no_sgbd_accepted') === 'true') {
     if (privacyOverlay) privacyOverlay.style.display = 'none';
     if (getCookie('pix_ads_cookie_accepted') !== 'true') {
@@ -324,24 +325,36 @@ document.addEventListener('DOMContentLoaded', () => {
     if (privacyOverlay) privacyOverlay.style.display = 'flex';
   }
 
+  // Ação instantânea do botão de aceitar (Funciona perfeitamente em PC e Celular)
   if (btnAcceptPrivacy) {
-    btnAcceptPrivacy.onclick = function() {
-      setCookie('privacy_no_sgbd_accepted', 'true', 365);
-      if (privacyOverlay) privacyOverlay.style.display = 'none';
+    const aceitarPrivacidade = function(e) {
+      if (e) e.preventDefault();
+      setCookie('privacy_no_sgbd_accepted', 'true', 1); // Dura 1 dia (ou altere para 365 se quiser)
+      if (privacyOverlay) {
+        privacyOverlay.style.display = 'none';
+        privacyOverlay.remove();
+      }
       if (getCookie('pix_ads_cookie_accepted') !== 'true') {
         if (pixCookieBanner) pixCookieBanner.style.display = 'block';
       }
     };
+
+    btnAcceptPrivacy.addEventListener('click', aceitarPrivacidade);
+    btnAcceptPrivacy.addEventListener('touchend', aceitarPrivacidade);
   }
 
   if (btnAcceptPixCookie) {
-    btnAcceptPixCookie.onclick = function() {
+    const aceitarCookiesPix = function(e) {
+      if (e) e.preventDefault();
       setCookie('pix_ads_cookie_accepted', 'true', 365);
       if (pixCookieBanner) pixCookieBanner.style.display = 'none';
     };
+
+    btnAcceptPixCookie.addEventListener('click', aceitarCookiesPix);
+    btnAcceptPixCookie.addEventListener('touchend', aceitarCookiesPix);
   }
 
-  // --- MODAL DE ANÚNCIOS E FIREBASE ---
+  // --- MODAL E FIREBASE DE ANÚNCIOS ---
   const firebaseConfig = {
     apiKey: "SUA_API_KEY_AQUI",
     authDomain: "SEU_PROJETO.firebaseapp.com",
