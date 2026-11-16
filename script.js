@@ -1,43 +1,43 @@
 const eWastePlaces = [
   {
     id: 1,
-    name: "PEV da Pref. de Londrina - Califórnia",
-    address: "R. Cap. João Busse, 1285 - Califórnia, Londrina - PR",
-    hours: "Seg a Sex 08h-19h30 | Sáb 08h-14h",
-    lat: -23.3275,
-    lng: -51.1412
+    name: "PEV Jardim Califórnia (CMTU / Prefeitura de Londrina)",
+    address: "Rua São Salvador, 110 - Jardim Califórnia, Londrina - PR",
+    hours: "Seg a Sex 08h-17h | Sáb 08h-12h",
+    lat: -23.3324,
+    lng: -51.1358
   },
   {
     id: 2,
-    name: "CMTU-PEV Califórnia",
-    address: "R. Cap. João Busse, 1274 - Califórnia, Londrina - PR",
+    name: "PEV Nova Conquista (CMTU Londrina)",
+    address: "Rua Floriano Peixoto, 305 - Jardim Nova Conquista, Londrina - PR",
     hours: "Seg a Sex 08h-17h | Sáb 08h-12h",
-    lat: -23.3280,
-    lng: -51.1405
+    lat: -23.3372,
+    lng: -51.1245
   },
   {
     id: 3,
-    name: "CRC E-LETRO - Vila Casoni",
+    name: "CRC E-LETRO - Descarte de Lixo Eletrônico",
     address: "Rua Ermelindo Leão, 385 - Vila Casoni, Londrina - PR",
     hours: "Seg a Sex 08h-12h e 13h30-18h",
-    lat: -23.3032,
-    lng: -51.1528
+    lat: -23.3036,
+    lng: -51.1524
   },
   {
     id: 4,
-    name: "E-Coleta Reciclagem Londrina",
-    address: "R. Santa Rita, 5 - Maria Lúcia, Londrina - PR",
+    name: "E-Coleta Reciclagem de Eletrônicos Londrina",
+    address: "Rua Santa Rita, 5 - Jardim Maria Lúcia, Londrina - PR",
     hours: "Seg a Sex 09h-18h | Sáb 09h-12h",
-    lat: -23.2754,
-    lng: -51.1821
+    lat: -23.2751,
+    lng: -51.1818
   },
   {
     id: 5,
-    name: "PEV Bela Vista",
+    name: "PEV Bela Vista (Coleta Eletrônica CMTU)",
     address: "Rua Chrestina Maria de Oliveira, 110 - Bela Vista, Londrina - PR",
     hours: "Seg a Sex 08h-17h",
-    lat: -23.2810,
-    lng: -51.1650
+    lat: -23.2814,
+    lng: -51.1647
   }
 ];
 
@@ -87,11 +87,12 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
-function getGoogleMapsRouteUrl(destLat, destLng) {
+function getGoogleMapsRouteUrl(place) {
+  const destinationQuery = encodeURIComponent(place.address);
   if (userLocation) {
-    return `https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lng}&destination=${destLat},${destLng}&travelmode=driving`;
+    return `https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lng}&destination=${destinationQuery}&travelmode=driving`;
   }
-  return `https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLng}&travelmode=driving`;
+  return `https://www.google.com/maps/dir/?api=1&destination=${destinationQuery}&travelmode=driving`;
 }
 
 function drawRouteToPlace(destLat, destLng, placeName) {
@@ -159,7 +160,7 @@ function plotMarkers(places) {
     });
 
     const marker = L.marker([place.lat, place.lng], { icon: pinIcon });
-    const googleMapsRouteUrl = getGoogleMapsRouteUrl(place.lat, place.lng);
+    const googleMapsRouteUrl = getGoogleMapsRouteUrl(place);
 
     const distText = place.distance ? `<br><b>Distância:</b> ${place.distance.toFixed(2)} km` : '';
     const nearestLabel = isNearest ? '<br><span style="color:#059669; font-weight:bold;">★ DESCARTE DE LIXO ELETRÔNICO MAIS PRÓXIMO</span>' : '<br><span style="color:#dc2626; font-weight:bold;">Ponto de Descarte de Lixo Eletrônico</span>';
@@ -205,7 +206,7 @@ function renderPlacesList(places) {
     
     const badgeNearest = (index === 0 && place.distance) ? '<span class="badge-nearest"><i class="fa-solid fa-star"></i> Mais Próximo</span>' : '';
     const distText = place.distance ? `<span class="dist-tag"><i class="fa-solid fa-route"></i> ${place.distance.toFixed(1)} km</span>` : '';
-    const googleMapsUrl = getGoogleMapsRouteUrl(place.lat, place.lng);
+    const googleMapsUrl = getGoogleMapsRouteUrl(place);
 
     card.innerHTML = `
       <div class="card-header">
