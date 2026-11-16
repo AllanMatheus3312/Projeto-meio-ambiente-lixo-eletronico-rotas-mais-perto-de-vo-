@@ -87,6 +87,12 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
+function getGoogleMapsRouteUrl(destLat, destLng) {
+  const originLat = userLocation ? userLocation.lat : -23.3103;
+  const originLng = userLocation ? userLocation.lng : -51.1592;
+  return `https://www.google.com/maps/dir/?api=1&origin=${originLat},${originLng}&destination=${destLat},${destLng}`;
+}
+
 function drawRouteToPlace(destLat, destLng, placeName) {
   const originLat = userLocation ? userLocation.lat : -23.3103;
   const originLng = userLocation ? userLocation.lng : -51.1592;
@@ -152,10 +158,7 @@ function plotMarkers(places) {
     });
 
     const marker = L.marker([place.lat, place.lng], { icon: pinIcon });
-    
-    const originLat = userLocation ? userLocation.lat : -23.3103;
-    const originLng = userLocation ? userLocation.lng : -51.1592;
-    const googleMapsRouteUrl = `https://www.google.com/maps/dir/?api=1&origin=${originLat},${originLng}&destination=${place.lat},${place.lng}`;
+    const googleMapsRouteUrl = getGoogleMapsRouteUrl(place.lat, place.lng);
 
     const distText = place.distance ? `<br><b>Distância:</b> ${place.distance.toFixed(2)} km` : '';
     const nearestLabel = isNearest ? '<br><span style="color:#059669; font-weight:bold;">★ DESCARTE DE LIXO ELETRÔNICO MAIS PRÓXIMO</span>' : '<br><span style="color:#dc2626; font-weight:bold;">Ponto de Descarte de Lixo Eletrônico</span>';
@@ -165,7 +168,7 @@ function plotMarkers(places) {
       ${place.address}${distText}<br>
       <div style="margin-top: 8px;">
         <a href="${googleMapsRouteUrl}" target="_blank" rel="noopener noreferrer" style="background:#0284c7; color:#fff; padding:6px 10px; border-radius:6px; text-decoration:none; font-size:11px; font-weight:bold; display:inline-block;">
-          <i class="fa-solid fa-map-location-dot"></i> Abrir Rota Pronta no Google Maps
+          <i class="fa-solid fa-map-location-dot"></i> Abrir Rota no Google Maps
         </a>
       </div>
     `);
@@ -201,6 +204,7 @@ function renderPlacesList(places) {
     
     const badgeNearest = (index === 0 && place.distance) ? '<span class="badge-nearest"><i class="fa-solid fa-star"></i> Mais Próximo</span>' : '';
     const distText = place.distance ? `<span class="dist-tag"><i class="fa-solid fa-route"></i> ${place.distance.toFixed(1)} km</span>` : '';
+    const googleMapsUrl = getGoogleMapsRouteUrl(place.lat, place.lng);
 
     card.innerHTML = `
       <div class="card-header">
@@ -210,7 +214,25 @@ function renderPlacesList(places) {
       <p><i class="fa-solid fa-location-dot"></i> ${place.address}</p>
       <p><i class="fa-solid fa-clock"></i> ${place.hours}</p>
       ${distText}
+      <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+        <button type="button" class="btn-card-local-route" style="flex:1; background:#047857; color:#fff; border:none; padding:8px 10px; border-radius:6px; font-size:0.8rem; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
+          <i class="fa-solid fa-route"></i> Iniciar Rota Aqui
+        </button>
+        <a href="${googleMapsUrl}" target="_blank" rel="noopener noreferrer" class="btn-card-gmaps" style="flex:1; background:#0284c7; color:#fff; text-decoration:none; padding:8px 10px; border-radius:6px; font-size:0.8rem; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:5px;">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Google Maps
+        </a>
+      </div>
     `;
+
+    card.querySelector('.btn-card-local-route').addEventListener('click', (e) => {
+      e.stopPropagation();
+      drawRouteToPlace(place.lat, place.lng, place.name);
+      document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+
+    card.querySelector('.btn-card-gmaps').addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
 
     card.addEventListener('click', () => {
       drawRouteToPlace(place.lat, place.lng, place.name);
@@ -264,7 +286,7 @@ function getUserLocation() {
 
       const closest = sortedPlaces[0];
       drawRouteToPlace(closest.lat, closest.lng, closest.name);
-      statusMsg.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#10b981;"></i> Rota traçada! O ponto mais próximo é <strong>${closest.name}</strong> (${closest.distance.toFixed(1)} km de você).`;
+      statusMsg.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#10b981;"></i> Rota iniciada! O ponto mais próximo é <strong>${closest.name}</strong> (${closest.distance.toFixed(1)} km de você).`;
     },
     (error) => {
       statusMsg.innerHTML = "Não foi possível obter sua localização. Permita o acesso à localização.";
