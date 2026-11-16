@@ -561,6 +561,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (bizLinkInput) bizLinkInput.addEventListener('input', checkPixAndFormInputs);
 
   const sponsorsGrid = document.getElementById('sponsorsGrid');
+  const footerSponsorsGrid = document.getElementById('footerSponsorsGrid');
   const vipStatusDisplay = document.getElementById('vipStatusDisplay');
   const vipImageContainer = document.getElementById('vipImageContainer');
   const btnVipAction = document.getElementById('btnVipAction');
@@ -598,9 +599,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (sponsorsGrid) {
       sponsorsGrid.innerHTML = '';
-      const normalAds = validAds.filter(ad => Number(ad.planAmount) !== 115.00);
+      const midAds = validAds.filter(ad => Number(ad.planAmount) === 30.00);
 
-      normalAds.forEach(ad => {
+      midAds.forEach(ad => {
         const card = document.createElement('div');
         card.className = 'sponsor-card';
         const diasRestantes = calculateRemainingDays(ad.expiresAt);
@@ -619,6 +620,32 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         `;
         sponsorsGrid.appendChild(card);
+      });
+    }
+
+    if (footerSponsorsGrid) {
+      footerSponsorsGrid.innerHTML = '';
+      const footerAds = validAds.filter(ad => Number(ad.planAmount) === 15.00);
+
+      footerAds.forEach(ad => {
+        const card = document.createElement('div');
+        card.className = 'sponsor-card';
+        const diasRestantes = calculateRemainingDays(ad.expiresAt);
+        const ownerDisplay = (!ad.hideUserName && ad.userName) ? `<br><small style="color:#64748b; font-weight:normal;">Anunciante: ${ad.userName}</small>` : '';
+        const paidInfo = ad.paidDateFormatted ? `<br><small style="color:#059669; font-size:0.75rem;">Pago em ${ad.paidDateFormatted} • Restam ${diasRestantes} dias</small>` : '';
+
+        card.innerHTML = `
+          ${ad.image ? `<img src="${ad.image}" alt="${ad.name}">` : ''}
+          <div class="sponsor-card-body">
+            <span class="sponsor-cat" style="color:#0284c7;">${ad.category} • Plano Básico (${diasRestantes} dias restantes)</span>
+            <h4>${ad.name}${ownerDisplay}</h4>
+            <p>${ad.desc}${paidInfo}</p>
+            <a href="${ad.link}" target="_blank" rel="noopener noreferrer" class="sponsor-link" style="background:#0284c7;">
+              Acessar / Contato <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
+          </div>
+        `;
+        footerSponsorsGrid.appendChild(card);
       });
     }
   }
