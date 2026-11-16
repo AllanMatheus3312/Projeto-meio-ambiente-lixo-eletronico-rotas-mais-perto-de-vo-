@@ -152,15 +152,22 @@ function plotMarkers(places) {
     });
 
     const marker = L.marker([place.lat, place.lng], { icon: pinIcon });
+    
+    const originLat = userLocation ? userLocation.lat : -23.3103;
+    const originLng = userLocation ? userLocation.lng : -51.1592;
+    const googleMapsRouteUrl = `https://www.google.com/maps/dir/?api=1&origin=${originLat},${originLng}&destination=${place.lat},${place.lng}`;
+
     const distText = place.distance ? `<br><b>Distância:</b> ${place.distance.toFixed(2)} km` : '';
     const nearestLabel = isNearest ? '<br><span style="color:#059669; font-weight:bold;">★ DESCARTE DE LIXO ELETRÔNICO MAIS PRÓXIMO</span>' : '<br><span style="color:#dc2626; font-weight:bold;">Ponto de Descarte de Lixo Eletrônico</span>';
     
     marker.bindPopup(`
       <b>${place.name}</b>${nearestLabel}<br>
       ${place.address}${distText}<br>
-      <a href="https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}" target="_blank">
-        Traçar Rota no Google Maps
-      </a>
+      <div style="margin-top: 8px;">
+        <a href="${googleMapsRouteUrl}" target="_blank" rel="noopener noreferrer" style="background:#0284c7; color:#fff; padding:6px 10px; border-radius:6px; text-decoration:none; font-size:11px; font-weight:bold; display:inline-block;">
+          <i class="fa-solid fa-map-location-dot"></i> Abrir Rota Pronta no Google Maps
+        </a>
+      </div>
     `);
 
     if (isNearest) {
