@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
 
@@ -44,7 +44,7 @@
       <div class="ads-cta-text">
         <span class="ads-badge"><i class="fa-solid fa-bullhorn"></i> ESPAÇO PATROCINADO • R$ 35,00 (30 DIAS)</span>
         <h3>Divulgue sua Empresa ou Trabalho Aqui!</h3>
-        <p>Aceita vários anunciantes simultaneamente. Paga uma vez, fica no ar por <strong>30 dias (1 mês)</strong> com expiração automática.</p>
+        <p>Aceita vários anunciantes simultaneamente. Paga uma vez, fica no ar por <strong>30 dias (1 mês)</strong> com expiração automática e segurança garantida.</p>
       </div>
       <button type="button" class="btn-advertise" onclick="openAdModalWithPrice('35.00', 'Plano Intermediário - 30 Dias (R$ 35,00)')">
         <i class="fa-solid fa-rocket"></i> Anunciar por R$ 35,00
@@ -132,13 +132,13 @@
     </div>
     <div class="floating-content">
       <div class="floating-text">
-        <span class="ads-badge" style="background:#7c3aed; color:#fff;"><i class="fa-solid fa-crown"></i> PLANO VIP ÚNICO • R$ 115,00 (30 DIAS)</span>
+        <span class="ads-badge" style="background:#164e43; color:#e6fffa;"><i class="fa-solid fa-crown"></i> PLANO VIP ÚNICO • R$ 115,00 (30 DIAS)</span>
         <div id="vipImageContainer" style="margin-top: 8px;"></div>
-        <div id="vipStatusDisplay" style="margin-top: 6px; font-size: 0.9rem; color: #f3e8ff;">
+        <div id="vipStatusDisplay" style="margin-top: 6px; font-size: 0.9rem; color: #e2e8f0;">
           Carregando status da vaga VIP...
         </div>
       </div>
-      <button type="button" id="btnVipAction" class="btn-advertise" style="background:#7c3aed; color:#fff; padding:14px 20px; font-size:1rem; width:100%; justify-content:center;" onclick="tryOpenVipPlan()">
+      <button type="button" id="btnVipAction" class="btn-advertise" style="background:#20c997; color:#0f172a; padding:12px 20px; font-size:1rem; width:100%; justify-content:center;" onclick="tryOpenVipPlan()">
         <i class="fa-solid fa-star"></i> Garantir Vaga VIP por R$ 115,00
       </button>
     </div>
@@ -152,7 +152,7 @@
         <span class="ads-badge" id="modalPlanBadge">PASSO 1 DE 2</span>
         <h3 id="modalPlanTitle">Libere seu Acesso via Pix</h3>
         <p class="modal-subtitle">
-          Preencha seus dados, anexe a imagem da sua empresa, informe seu link e realize o pagamento via Pix com valor automático. Os anúncios permanecem ativos por <strong>exatamente 30 dias</strong> e são removidos automaticamente após esse período.
+          Preencha seus dados comerciais, anexe a imagem da sua empresa, informe seu link e realize o pagamento via Pix com valor automático. Para sua segurança e do site, o comprovante e os dados da transação são armazenados para comprovação de vigência do plano.
         </p>
 
         <form id="pixDataForm" class="marketing-form" style="margin-bottom: 20px; text-align: left; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
@@ -234,6 +234,6 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
-  <script src="script.js?v=3"></script>
+  <script src="script.js?v=5"></script>
 </body>
 </html>

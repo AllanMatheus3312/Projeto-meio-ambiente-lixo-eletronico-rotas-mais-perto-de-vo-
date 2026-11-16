@@ -576,9 +576,9 @@ document.addEventListener('DOMContentLoaded', () => {
       <div style="font-size: 2.2rem; color: #047857; margin-bottom: 12px; text-align: center;">
         <i class="fa-solid fa-shield-halved"></i>
       </div>
-      <h3 style="color: #0f172a; margin-bottom: 12px; font-size: 1.3rem; font-family: sans-serif; text-align: center;">Aviso de Privacidade e Termos de Uso</h3>
+      <h3 style="color: #0f172a; margin-bottom: 12px; font-size: 1.3rem; font-family: sans-serif; text-align: center;">Aviso de Privacidade, Termos e Segurança</h3>
       <p style="font-size: 0.9rem; color: #475569; margin-bottom: 16px; font-family: sans-serif; line-height: 1.6;">
-        Em conformidade com a LGPD, informamos que <strong>não armazenamos dados pessoais sigilosos em servidores externos ou bancos de dados centralizados</strong>. As informações fornecidas para divulgação comercial são processadas exclusivamente de forma local no navegador do usuário pelo período fixo de <strong>30 dias (1 mês)</strong>, sendo os registros automaticamente excluídos após o término da vigência.
+        Em conformidade com a LGPD, informamos que <strong>não coletamos nem armazenamos dados pessoais sensíveis</strong>. Para sua segurança e do site (garantia de vigência e comprovação de anúncios pagos), armazenamos apenas os dados comerciais estritamente necessários: <strong>nome da empresa, nome do anunciante, comprovante e ID da transação Pix, além da data de início e término do plano contratado</strong>. Esses registros são mantidos de forma segura para resguardar ambas as partes.
       </p>
       <button id="btnJsAceitar" type="button" style="
         background: #047857;
@@ -699,16 +699,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const diasRestantes = calculateRemainingDays(vipItem.expiresAt);
         const ownerDisplay = (!vipItem.hideUserName && vipItem.userName) ? ` • Anunciante: ${vipItem.userName}` : '';
         const paidDateStr = vipItem.paidDateFormatted ? ` • Pago em: ${vipItem.paidDateFormatted}` : '';
-        vipImageContainer.innerHTML = vipItem.image ? `<img src="${vipItem.image}" alt="${vipItem.name}" style="width:100%; height:120px; object-fit:cover; border-radius:8px; border:2px solid #a78bfa;">` : '';
-        vipStatusDisplay.innerHTML = `<strong>${vipItem.name}</strong>${ownerDisplay}<br><span style="font-size:0.8rem; color:#cbd5e1;">${vipItem.desc}</span><br><small style="color:#a78bfa;">Restam ${diasRestantes} dias${paidDateStr}</small>`;
+        vipImageContainer.innerHTML = vipItem.image ? `<img src="${vipItem.image}" alt="${vipItem.name}" style="width:100%; height:120px; object-fit:cover; border-radius:8px; border:2px solid #20c997;">` : '';
+        vipStatusDisplay.innerHTML = `<strong>${vipItem.name}</strong>${ownerDisplay}<br><span style="font-size:0.8rem; color:#e2e8f0;">${vipItem.desc}</span><br><small style="color:#20c997;">Restam ${diasRestantes} dias${paidDateStr}</small>`;
         btnVipAction.innerHTML = `<i class="fa-solid fa-arrow-up-right-from-square"></i> Visitar ${vipItem.name}`;
-        btnVipAction.style.background = '#10b981';
+        btnVipAction.style.background = '#20c997';
+        btnVipAction.style.color = '#0f172a';
         btnVipAction.onclick = () => window.open(vipItem.link, '_blank', 'noopener,noreferrer');
       } else {
         vipImageContainer.innerHTML = '';
-        vipStatusDisplay.innerHTML = `Vaga livre! O primeiro que pagar garante exclusividade com imagem por 30 dias.`;
+        vipStatusDisplay.innerHTML = `Vaga VIP exclusiva disponível! Garanta seu destaque por 30 dias.`;
         btnVipAction.innerHTML = '<i class="fa-solid fa-star"></i> Garantir Vaga VIP por R$ 115,00';
-        btnVipAction.style.background = '#7c3aed';
+        btnVipAction.style.background = '#20c997';
+        btnVipAction.style.color = '#0f172a';
         btnVipAction.onclick = () => window.tryOpenVipPlan();
       }
     }
@@ -860,6 +862,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         currentAds.unshift(adData);
         localStorage.setItem('lixo_eletronico_ads', JSON.stringify(currentAds));
+
+        // HISTÓRICO PERMANENTE DE SEGURANÇA E AUDITORIA COMERCIAL
+        let historicoPermanente = JSON.parse(localStorage.getItem('lixo_eletronico_historico_permanente') || '[]');
+        historicoPermanente.unshift({
+          ...adData,
+          registradoEm: new Date().toLocaleString('pt-BR')
+        });
+        localStorage.setItem('lixo_eletronico_historico_permanente', JSON.stringify(historicoPermanente));
+
         renderPortal();
 
         document.getElementById('pixDataForm').reset();
@@ -868,7 +879,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnVerifyPix.disabled = true;
         btnVerifyPix.innerHTML = '<i class="fa-solid fa-check"></i> Confirmar Pagamento e Publicar';
         adModal.style.display = 'none';
-        alert(`Parabéns! Anúncio de "${name}" publicado com sucesso por ${totalDays} dias (expira em ${expiresDateFormatted})!`);
+        alert(`Parabéns! Anúncio de "${name}" publicado com sucesso por ${totalDays} dias (expira em ${expiresDateFormatted})! Dados salvos no histórico de segurança.`);
       };
 
       compressImage(imgFile, saveAd);
