@@ -88,9 +88,10 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 }
 
 function getGoogleMapsRouteUrl(destLat, destLng) {
-  const originLat = userLocation ? userLocation.lat : -23.3103;
-  const originLng = userLocation ? userLocation.lng : -51.1592;
-  return `https://www.google.com/maps/dir/?api=1&origin=${originLat},${originLng}&destination=${destLat},${destLng}`;
+  if (userLocation) {
+    return `https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lng}&destination=${destLat},${destLng}&travelmode=driving`;
+  }
+  return `https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLng}&travelmode=driving`;
 }
 
 function drawRouteToPlace(destLat, destLng, placeName) {
@@ -289,8 +290,9 @@ function getUserLocation() {
       statusMsg.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#10b981;"></i> Rota iniciada! O ponto mais próximo é <strong>${closest.name}</strong> (${closest.distance.toFixed(1)} km de você).`;
     },
     (error) => {
-      statusMsg.innerHTML = "Não foi possível obter sua localização. Permita o acesso à localização.";
-    }
+      statusMsg.innerHTML = "Não foi possível obter sua localização no navegador. Clique em 'Iniciar Rota Aqui' em qualquer ponto abaixo para traçar a partir do Centro.";
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
   );
 }
 

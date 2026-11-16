@@ -290,6 +290,54 @@ body {
   font-weight: bold;
 }
 
+.card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-card-local-route {
+  flex: 1;
+  background: #047857;
+  color: #fff;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: background 0.2s;
+}
+
+.btn-card-local-route:hover {
+  background: #065f46;
+}
+
+.btn-card-gmaps {
+  flex: 1;
+  background: #0284c7;
+  color: #fff;
+  text-decoration: none;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: background 0.2s;
+}
+
+.btn-card-gmaps:hover {
+  background: #0369a1;
+}
+
 .map-wrapper {
   height: 500px;
   border-radius: 8px;
