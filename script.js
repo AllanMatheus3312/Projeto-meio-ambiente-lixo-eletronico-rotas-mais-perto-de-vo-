@@ -243,11 +243,9 @@ let selectedPlanAmount = "30.00";
 
 window.openAdModalWithPrice = function(amount, planTitle) {
   const adModal = document.getElementById('adPaymentModal');
-  const stepPix = document.getElementById('stepPixPayment');
-  const stepForm = document.getElementById('stepMarketingForm');
   selectedPlanAmount = amount;
   
-  document.getElementById('modalPlanBadge').innerText = `PLANO SELECIONADO • VALOR: R$ ${amount} • DURAÇÃO 1 MÊS`;
+  document.getElementById('modalPlanBadge').innerText = `PLANO SELECIONADO • VALOR: R$ ${amount} • 30 DIAS (1 MÊS)`;
   document.getElementById('modalPlanTitle').innerText = planTitle;
 
   const payload = generatePixPayload(PIX_KEY, amount);
@@ -255,13 +253,6 @@ window.openAdModalWithPrice = function(amount, planTitle) {
   document.getElementById('pixQrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(payload)}`;
 
   adModal.style.display = 'flex';
-  if (getCookie('pix_paid_unlocked') === 'true' && sessionStorage.getItem('current_pix_txid')) {
-    stepPix.style.display = 'none';
-    stepForm.style.display = 'block';
-  } else {
-    stepPix.style.display = 'block';
-    stepForm.style.display = 'none';
-  }
 };
 
 function generatePixPayload(key, amount = "30.00", merchantName = "LIXO ELETRONICO LONDRINA", city = "LONDRINA") {
@@ -287,17 +278,6 @@ function generatePixPayload(key, amount = "30.00", merchantName = "LIXO ELETRONI
     }
   }
   return payload + (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
-}
-
-function setCookie(name, value, days) {
-  const d = new Date();
-  d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
-  document.cookie = `${name}=${value};expires=${d.toUTCString()};path=/`;
-}
-
-function getCookie(name) {
-  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-  return match ? match[2] : null;
 }
 
 function isValidEndToEndPixId(txId) {
@@ -368,70 +348,69 @@ function makeVipBannerDraggable() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (localStorage.getItem('lgpd_aceito') !== 'true') {
-    const overlay = document.createElement('div');
-    overlay.id = 'jsCookieBox';
-    overlay.style.cssText = `
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.85);
-      z-index: 2147483647;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    `;
+  // Aviso de cookies formal obrigatório ao carregar ou reiniciar a página
+  const overlay = document.createElement('div');
+  overlay.id = 'jsCookieBox';
+  overlay.style.cssText = `
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.85);
+    z-index: 2147483647;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  `;
 
-    const box = document.createElement('div');
-    box.style.cssText = `
-      background: #ffffff;
-      max-width: 480px;
+  const box = document.createElement('div');
+  box.style.cssText = `
+    background: #ffffff;
+    max-width: 520px;
+    width: 100%;
+    padding: 32px;
+    border-radius: 12px;
+    text-align: left;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+  `;
+
+  box.innerHTML = `
+    <div style="font-size: 2.2rem; color: #047857; margin-bottom: 12px; text-align: center;">
+      <i class="fa-solid fa-shield-halved"></i>
+    </div>
+    <h3 style="color: #0f172a; margin-bottom: 12px; font-size: 1.3rem; font-family: sans-serif; text-align: center;">Aviso de Privacidade, Cookies e SGBD</h3>
+    <p style="font-size: 0.9rem; color: #475569; margin-bottom: 16px; font-family: sans-serif; line-height: 1.6;">
+      Em conformidade com a LGPD, utilizamos cookies e SGBD (Sistema de Gerenciamento de Banco de Dados) para registrar de forma segura os dados do anunciante, nome da empresa, comprovantes Pix e contagem exata de <strong>30 dias (1 mês)</strong> de vigência dos planos.
+    </p>
+    <button id="btnJsAceitar" type="button" style="
+      background: #047857;
+      color: #fff;
+      border: none;
+      padding: 14px 24px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
       width: 100%;
-      padding: 28px;
-      border-radius: 12px;
       text-align: center;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
-    `;
+    ">Entendi e Concordar</button>
+  `;
 
-    box.innerHTML = `
-      <div style="font-size: 2.5rem; color: #047857; margin-bottom: 12px;">
-        <i class="fa-solid fa-shield-halved"></i>
-      </div>
-      <h3 style="color: #0f172a; margin-bottom: 10px; font-size: 1.35rem; font-family: sans-serif;">Aviso de Privacidade e Proteção de Dados</h3>
-      <p style="font-size: 0.95rem; color: #475569; margin-bottom: 20px; font-family: sans-serif; line-height: 1.5;">
-        Aviso de Cookies e Privacidade: este site opera sem banco de dados (SGBD) de rastreamento de usuários.
-      </p>
-      <button id="btnJsAceitar" type="button" style="
-        background: #047857;
-        color: #fff;
-        border: none;
-        padding: 14px 24px;
-        border-radius: 8px;
-        font-weight: bold;
-        font-size: 1rem;
-        cursor: pointer;
-        width: 100%;
-      ">Entendi e Continuar</button>
-    `;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
 
-    overlay.appendChild(box);
-    document.body.appendChild(overlay);
+  const apagarCaixa = function(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+    }
+    overlay.remove();
+  };
 
-    const apagarCaixa = function(e) {
-      if (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-      }
-      localStorage.setItem('lgpd_aceito', 'true');
-      overlay.remove();
-    };
-
-    const btnAceitar = document.getElementById('btnJsAceitar');
-    btnAceitar.addEventListener('click', apagarCaixa);
-    btnAceitar.addEventListener('touchend', apagarCaixa);
-    btnAceitar.addEventListener('pointerdown', apagarCaixa);
-  }
+  const btnAceitar = document.getElementById('btnJsAceitar');
+  btnAceitar.addEventListener('click', apagarCaixa);
+  btnAceitar.addEventListener('touchend', apagarCaixa);
+  btnAceitar.addEventListener('pointerdown', apagarCaixa);
 
   initMap();
   makeVipBannerDraggable();
@@ -456,11 +435,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const adModal = document.getElementById('adPaymentModal');
   const btnCloseAd = document.getElementById('btnCloseAdModal');
-  const stepPix = document.getElementById('stepPixPayment');
-  const stepForm = document.getElementById('stepMarketingForm');
   const txIdInput = document.getElementById('pixTxIdInput');
   const receiptInput = document.getElementById('pixReceiptInput');
   const btnVerifyPix = document.getElementById('btnVerifyPix');
+  const bizNameInput = document.getElementById('inputBizName');
+  const bizCategoryInput = document.getElementById('inputBizCategory');
+  const bizDescInput = document.getElementById('inputBizDesc');
+  const bizLinkInput = document.getElementById('inputBizLink');
 
   if (btnCloseAd) {
     btnCloseAd.addEventListener('click', () => {
@@ -477,54 +458,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function checkPixInputs() {
-    if (!receiptInput || !txIdInput || !btnVerifyPix) return;
+  function checkPixAndFormInputs() {
+    if (!receiptInput || !txIdInput || !btnVerifyPix || !bizNameInput || !bizCategoryInput || !bizDescInput || !bizLinkInput) return;
     const hasReceipt = receiptInput.files.length > 0;
     const hasValidTxId = isValidEndToEndPixId(txIdInput.value.trim());
-    btnVerifyPix.disabled = !(hasReceipt && hasValidTxId);
+    const hasBizName = bizNameInput.value.trim() !== "";
+    const hasCategory = bizCategoryInput.value.trim() !== "";
+    const hasDesc = bizDescInput.value.trim() !== "";
+    const hasLink = bizLinkInput.value.trim() !== "";
+
+    btnVerifyPix.disabled = !(hasReceipt && hasValidTxId && hasBizName && hasCategory && hasDesc && hasLink);
   }
 
-  if (receiptInput) receiptInput.addEventListener('change', checkPixInputs);
-  if (txIdInput) txIdInput.addEventListener('input', checkPixInputs);
-
-  if (btnVerifyPix) {
-    btnVerifyPix.addEventListener('click', async () => {
-      const txId = txIdInput.value.trim();
-
-      if (!isValidEndToEndPixId(txId)) {
-        alert('ID de transação Pix inválido. Informe o código EndToEndId oficial de 32 caracteres iniciado com a letra E.');
-        return;
-      }
-
-      btnVerifyPix.disabled = true;
-      btnVerifyPix.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verificando pagamento no Mercado Pago...';
-
-      const usedTxIds = JSON.parse(localStorage.getItem('used_pix_txids') || '[]');
-      if (usedTxIds.includes(txId)) {
-        alert('Este ID de transação Pix já foi utilizado. Cada pagamento único garante 1 mês de divulgação.');
-        btnVerifyPix.innerHTML = '<i class="fa-solid fa-unlock"></i> Confirmar Pagamento e Liberar Divulgação';
-        btnVerifyPix.disabled = false;
-        return;
-      }
-
-      if (db) {
-        const existing = await db.collection('anuncios_pagos').where('txId', '==', txId).get();
-        if (!existing.empty) {
-          alert('Este ID de transação Pix já está vinculado a um anúncio ativo.');
-          btnVerifyPix.innerHTML = '<i class="fa-solid fa-unlock"></i> Confirmar Pagamento e Liberar Divulgação';
-          btnVerifyPix.disabled = false;
-          return;
-        }
-      }
-
-      setTimeout(() => {
-        setCookie('pix_paid_unlocked', 'true', 30);
-        sessionStorage.setItem('current_pix_txid', txId);
-        stepPix.style.display = 'none';
-        stepForm.style.display = 'block';
-      }, 800);
-    });
-  }
+  if (receiptInput) receiptInput.addEventListener('change', checkPixAndFormInputs);
+  if (txIdInput) txIdInput.addEventListener('input', checkPixAndFormInputs);
+  if (bizNameInput) bizNameInput.addEventListener('input', checkPixAndFormInputs);
+  if (bizCategoryInput) bizCategoryInput.addEventListener('input', checkPixAndFormInputs);
+  if (bizDescInput) bizDescInput.addEventListener('input', checkPixAndFormInputs);
+  if (bizLinkInput) bizLinkInput.addEventListener('input', checkPixAndFormInputs);
 
   const sponsorsGrid = document.getElementById('sponsorsGrid');
   function drawAdsCards(adsList) {
@@ -536,14 +487,16 @@ document.addEventListener('DOMContentLoaded', () => {
     activeAds.forEach(ad => {
       const card = document.createElement('div');
       card.className = 'sponsor-card';
+      const ownerDisplay = (!ad.hideUserName && ad.userName) ? `<br><small style="color:#64748b; font-weight:normal;">Anunciante: ${ad.userName}</small>` : '';
+
       card.innerHTML = `
         ${ad.image ? `<img src="${ad.image}" alt="${ad.name}">` : ''}
         <div class="sponsor-card-body">
-          <span class="sponsor-cat">${ad.category} • Patrocinado (1 Mês)</span>
-          <h4>${ad.name}</h4>
+          <span class="sponsor-cat">${ad.category} • Patrocinado (30 Dias)</span>
+          <h4>${ad.name}${ownerDisplay}</h4>
           <p>${ad.desc}</p>
           <a href="${ad.link}" target="_blank" rel="noopener noreferrer" class="sponsor-link">
-            Conhecer Empresa / Contato <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            Acessar / Contato <i class="fa-solid fa-arrow-up-right-from-square"></i>
           </a>
         </div>
       `;
@@ -585,32 +538,42 @@ document.addEventListener('DOMContentLoaded', () => {
     reader.readAsDataURL(file);
   }
 
-  const marketingForm = document.getElementById('marketingForm');
-  if (marketingForm) {
-    marketingForm.addEventListener('submit', (e) => {
-      e.preventDefault();
+  if (btnVerifyPix) {
+    btnVerifyPix.addEventListener('click', async () => {
+      const txId = txIdInput.value.trim();
 
-      const txId = sessionStorage.getItem('current_pix_txid');
-      if (!txId || !isValidEndToEndPixId(txId)) {
-        alert('Pagamento Pix não identificado. Realize o pagamento antes de publicar.');
-        stepForm.style.display = 'none';
-        stepPix.style.display = 'block';
+      if (!isValidEndToEndPixId(txId)) {
+        alert('ID de transação Pix inválido. Informe o código EndToEndId oficial de 32 caracteres iniciado com a letra E.');
         return;
       }
 
-      const btnPublish = document.getElementById('btnPublishAd');
-      btnPublish.disabled = true;
-      btnPublish.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Publicando por 1 mês...';
+      const userName = document.getElementById('inputUserName').value.trim();
+      const hideUserName = document.getElementById('inputHideName').checked;
+      const name = bizNameInput.value.trim();
+      const category = bizCategoryInput.value.trim();
+      const desc = bizDescInput.value.trim();
+      const link = bizLinkInput.value.trim();
+      const imgFile = document.getElementById('inputBizImage').files.length > 0 ? document.getElementById('inputBizImage').files[0] : null;
 
-      const name = document.getElementById('bizName').value.trim();
-      const category = document.getElementById('bizCategory').value.trim();
-      const desc = document.getElementById('bizDesc').value.trim();
-      const link = document.getElementById('bizLink').value.trim();
-      const imgFile = document.getElementById('bizImage').files.length > 0 ? document.getElementById('bizImage').files[0] : null;
+      btnVerifyPix.disabled = true;
+      btnVerifyPix.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando no SGBD por 30 Dias...';
+
+      if (db) {
+        const existing = await db.collection('anuncios_pagos').where('txId', '==', txId).get();
+        if (!existing.empty) {
+          alert('Este ID de transação Pix já está registrado no banco de dados.');
+          btnVerifyPix.innerHTML = '<i class="fa-solid fa-check"></i> Confirmar Pagamento, Salvar no SGBD e Publicar Anúncio';
+          btnVerifyPix.disabled = false;
+          return;
+        }
+      }
+
       const oneMonthMs = 30 * 24 * 60 * 60 * 1000;
 
       const saveAd = async (imgData) => {
         const adData = {
+          userName,
+          hideUserName,
           name,
           category,
           desc,
@@ -622,10 +585,6 @@ document.addEventListener('DOMContentLoaded', () => {
           expiresAt: Date.now() + oneMonthMs
         };
 
-        const usedTxIds = JSON.parse(localStorage.getItem('used_pix_txids') || '[]');
-        usedTxIds.push(txId);
-        localStorage.setItem('used_pix_txids', JSON.stringify(usedTxIds));
-
         if (db) {
           await db.collection('anuncios_pagos').add(adData);
         } else {
@@ -635,16 +594,13 @@ document.addEventListener('DOMContentLoaded', () => {
           loadPublicSponsors();
         }
 
-        setCookie('pix_paid_unlocked', 'false', -1);
-        sessionStorage.removeItem('current_pix_txid');
-        e.target.reset();
+        document.getElementById('pixDataForm').reset();
         txIdInput.value = '';
         receiptInput.value = '';
         btnVerifyPix.disabled = true;
-        btnVerifyPix.innerHTML = '<i class="fa-solid fa-unlock"></i> Confirmar Pagamento e Liberar Divulgação';
-        btnPublish.disabled = false;
-        btnPublish.innerHTML = '<i class="fa-solid fa-check"></i> Publicar Anúncio por 1 Mês';
+        btnVerifyPix.innerHTML = '<i class="fa-solid fa-check"></i> Confirmar Pagamento, Salvar no SGBD e Publicar Anúncio';
         adModal.style.display = 'none';
+        alert('Parabéns! Pagamento verificado e anúncio publicado com sucesso no SGBD por 30 dias!');
       };
 
       if (imgFile) {

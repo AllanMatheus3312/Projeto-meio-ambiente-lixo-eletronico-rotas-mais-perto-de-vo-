@@ -336,7 +336,7 @@ body {
 }
 
 .custom-modal.modal-lg {
-  max-width: 580px;
+  max-width: 640px;
   text-align: left;
   max-height: 90vh;
   overflow-y: auto;
@@ -358,7 +358,7 @@ body {
   background: #047857;
   color: #fff;
   border: none;
-  padding: 12px 24px;
+  padding: 14px 24px;
   border-radius: 8px;
   font-weight: bold;
   font-size: 1rem;
@@ -454,32 +454,34 @@ body {
   transform: translateY(-2px);
 }
 
+/* BANNER VIP GRANDE E DESTACADO */
 .floating-vip-banner {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 30px;
+  right: 30px;
   background: linear-gradient(135deg, #1e1b4b, #312e81);
   color: #fff;
-  padding: 10px 14px;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+  padding: 20px 24px;
+  border-radius: 18px;
+  box-shadow: 0 20px 45px rgba(0,0,0,0.5);
   z-index: 999;
-  border: 2px solid #7c3aed;
-  width: 280px;
+  border: 3px solid #7c3aed;
+  width: 380px;
   touch-action: none;
   user-select: none;
 }
 
 .floating-drag-handle {
-  background: rgba(124, 58, 237, 0.35);
-  color: #ddd6fe;
-  font-size: 11px;
+  background: rgba(124, 58, 237, 0.6);
+  color: #f5f3ff;
+  font-size: 13px;
   font-weight: bold;
   text-align: center;
-  padding: 4px 8px;
-  border-radius: 6px;
-  margin-bottom: 8px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 14px;
   cursor: grab;
+  letter-spacing: 0.5px;
 }
 
 .floating-drag-handle:active {
@@ -489,13 +491,14 @@ body {
 .floating-content {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 14px;
 }
 
 .floating-text p {
-  font-size: 0.78rem;
+  font-size: 0.95rem;
   color: #e2e8f0;
   margin: 0;
+  line-height: 1.5;
 }
 
 .sponsors-grid {
@@ -632,28 +635,4 @@ body {
   font-weight: bold;
   color: #065f46;
   margin-bottom: 8px;
-}
-
-.marketing-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.marketing-form input[type="text"],
-.marketing-form input[type="url"],
-.marketing-form textarea {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  font-size: 0.95rem;
-}
-
-.file-upload-label {
-  font-size: 0.85rem;
-  color: #334155;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
 }
