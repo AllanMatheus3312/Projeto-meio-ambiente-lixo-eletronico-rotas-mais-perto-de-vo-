@@ -41,9 +41,9 @@
   <section class="ads-section container">
     <div class="ads-cta-banner">
       <div class="ads-cta-text">
-        <span class="ads-badge"><i class="fa-solid fa-bullhorn"></i> ESPAÇO PATROCINADO • R$ 30,00 (PAGAMENTO ÚNICO - 30 DIAS)</span>
+        <span class="ads-badge"><i class="fa-solid fa-bullhorn"></i> ESPAÇO PATROCINADO • R$ 30,00 (VÁRIOS ANUNCIANTES - 30 DIAS)</span>
         <h3>Divulgue sua Empresa ou Trabalho Aqui!</h3>
-        <p>Alcance moradores de Londrina. Paga uma vez, fica no ar por <strong>1 mês (30 dias)</strong>. O nome da empresa e a imagem aparecem publicamente para todo mundo ver.</p>
+        <p>Aceita vários anunciantes simultaneamente. Paga uma vez, fica no ar por <strong>30 dias (1 mês)</strong> com expiração automática e renovação opcional.</p>
       </div>
       <button type="button" class="btn-advertise" onclick="openAdModalWithPrice('30.00', 'Plano Intermediário - 30 Dias (R$ 30,00)')">
         <i class="fa-solid fa-rocket"></i> Anunciar por R$ 30,00
@@ -113,9 +113,9 @@
   <section class="footer-ads-section container">
     <div class="ads-cta-banner footer-banner-style">
       <div class="ads-cta-text">
-        <span class="ads-badge" style="background:#0284c7; color:#fff;"><i class="fa-solid fa-tag"></i> PLANO ECONÔMICO • R$ 15,00 (PAGAMENTO ÚNICO - 30 DIAS)</span>
+        <span class="ads-badge" style="background:#0284c7; color:#fff;"><i class="fa-solid fa-tag"></i> PLANO ECONÔMICO • R$ 15,00 (VÁRIOS ANUNCIANTES - 30 DIAS)</span>
         <h3>Quer Divulgar com Menor Custo?</h3>
-        <p>Cadastre sua empresa no plano básico de R$ 15,00. Paga uma vez, fica ativo por <strong>30 dias (1 mês)</strong> e depois renova.</p>
+        <p>Cadastre sua empresa no plano básico de R$ 15,00 por <strong>30 dias (1 mês)</strong> com remoção automática ao expirar.</p>
       </div>
       <button type="button" class="btn-advertise" style="background:#0284c7; color:#fff;" onclick="openAdModalWithPrice('15.00', 'Plano Básico - 30 Dias (R$ 15,00)')">
         <i class="fa-solid fa-bolt"></i> Anunciar por R$ 15,00
@@ -125,15 +125,18 @@
 
   <div id="floatingVipBanner" class="floating-vip-banner">
     <div class="floating-drag-handle" id="vipDragHandle" title="Arraste para mover o banner VIP">
-      <span><i class="fa-solid fa-up-down-left-right"></i> ARRASTAR PLANO VIP (DESTAQUE GRANDE)</span>
+      <span><i class="fa-solid fa-up-down-left-right"></i> ARRASTAR PLANO VIP EXCLUSIVO (R$ 115,00)</span>
     </div>
     <div class="floating-content">
       <div class="floating-text">
-        <span class="ads-badge" style="background:#7c3aed; color:#fff;"><i class="fa-solid fa-crown"></i> PLANO VIP • R$ 70,00 (30 DIAS)</span>
-        <p>Destaque máximo no topo. Paga uma vez, exibe por <strong>30 dias</strong> e renova após 1 mês.</p>
+        <span class="ads-badge" style="background:#7c3aed; color:#fff;"><i class="fa-solid fa-crown"></i> PLANO VIP ÚNICO • R$ 115,00 (30 DIAS)</span>
+        <div id="vipImageContainer" style="margin-top: 8px;"></div>
+        <div id="vipStatusDisplay" style="margin-top: 6px; font-size: 0.9rem; color: #f3e8ff;">
+          Carregando status da vaga VIP...
+        </div>
       </div>
-      <button type="button" class="btn-advertise" style="background:#7c3aed; color:#fff; padding:14px 20px; font-size:1rem; width:100%; justify-content:center;" onclick="openAdModalWithPrice('70.00', 'Plano VIP Destaque - 30 Dias (R$ 70,00)')">
-        <i class="fa-solid fa-star"></i> Destacar por R$ 70,00
+      <button type="button" id="btnVipAction" class="btn-advertise" style="background:#7c3aed; color:#fff; padding:14px 20px; font-size:1rem; width:100%; justify-content:center;" onclick="tryOpenVipPlan()">
+        <i class="fa-solid fa-star"></i> Garantir Vaga VIP por R$ 115,00
       </button>
     </div>
   </div>
@@ -146,23 +149,22 @@
         <span class="ads-badge" id="modalPlanBadge">PASSO 1 DE 2</span>
         <h3 id="modalPlanTitle">Libere seu Acesso via Pix</h3>
         <p class="modal-subtitle">
-          Preencha seus dados, informe o nome da sua empresa (obrigatório e visível para todos), seu link (Instagram/WhatsApp) e realize o pagamento via Pix. O SGBD armazena tudo com validade exata de <strong>30 dias (1 mês)</strong>.
+          Preencha seus dados, anexe a imagem da sua empresa, informe seu link e realize o pagamento via Pix com valor automático. Os anúncios permanecem ativos por <strong>exatamente 30 dias</strong> e são removidos automaticamente após esse período.
         </p>
 
-        <!-- FORMULÁRIO DE DADOS INTEGRADO DIRETAMENTE NO PASSO DO PIX -->
         <form id="pixDataForm" class="marketing-form" style="margin-bottom: 20px; text-align: left; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
           <div class="form-group" style="margin-bottom: 12px;">
             <label for="inputUserName" style="font-size:0.85rem; font-weight:bold; color:#334155;">Seu Nome (Anunciante):</label>
             <input type="text" id="inputUserName" placeholder="Ex: João da Silva" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px;" />
             <div class="checkbox-wrapper" style="margin-top: 4px;">
               <label style="font-size:0.78rem; color:#64748b; font-weight:normal; cursor:pointer;">
-                <input type="checkbox" id="inputHideName" /> Ocultar meu nome pessoal para os outros usuários (ficará visível apenas o nome da empresa)
+                <input type="checkbox" id="inputHideName" /> Ocultar meu nome pessoal para os outros usuários
               </label>
             </div>
           </div>
 
           <div class="form-group" style="margin-bottom: 12px;">
-            <label for="inputBizName" style="font-size:0.85rem; font-weight:bold; color:#334155;">Nome da Empresa (Obrigatório e Visível para Todos): *</label>
+            <label for="inputBizName" style="font-size:0.85rem; font-weight:bold; color:#334155;">Nome da Empresa (Visível para Todos): *</label>
             <input type="text" id="inputBizName" placeholder="Ex: Eletrônicos Londrina" required style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px;" />
           </div>
 
@@ -176,21 +178,26 @@
             <textarea id="inputBizDesc" rows="2" placeholder="Descreva seu trabalho..." required style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px;"></textarea>
           </div>
 
-          <div class="form-group" style="margin-bottom: 6px;">
+          <div class="form-group" style="margin-bottom: 12px;">
             <label for="inputBizLink" style="font-size:0.85rem; font-weight:bold; color:#334155;">Link de Contato (WhatsApp, Instagram ou Site): *</label>
             <input type="url" id="inputBizLink" placeholder="https://instagram.com/suaempresa ou https://wa.me/..." required style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px;" />
           </div>
 
           <div class="form-group">
-            <label style="font-size:0.85rem; font-weight:bold; color:#334155;">Imagem / Logo da Empresa (visível para todos):</label>
-            <input type="file" id="inputBizImage" accept="image/*" style="font-size:0.85rem; margin-top:4px;" />
+            <label for="inputBizImage" style="font-size:0.85rem; font-weight:bold; color:#047857;">
+              <i class="fa-solid fa-image"></i> Imagem / Banner / Logo da Empresa (Obrigatório): *
+            </label>
+            <input type="file" id="inputBizImage" accept="image/*" required style="font-size:0.85rem; margin-top:4px; display:block; width:100%;" />
           </div>
         </form>
 
         <div class="pix-box">
           <img id="pixQrImage" src="" alt="QR Code Pix" class="pix-qr" />
           <div class="pix-details">
-            <label style="display: block;">Código Pix Copia e Cola:</label>
+            <div id="pixExactAmountDisplay" style="font-size: 1rem; font-weight: bold; color: #047857; margin-bottom: 6px;">
+              Valor Automático no Pix: R$ 30,00
+            </div>
+            <label style="display: block;">Código Pix Copia e Cola (Valor já incluso):</label>
             <div class="pix-copy-row">
               <input type="text" id="pixPayloadInput" readonly />
               <button type="button" id="btnCopyPayload" class="btn-copy"><i class="fa-regular fa-copy"></i> Copiar Código</button>
@@ -208,9 +215,15 @@
             <i class="fa-solid fa-receipt"></i> Anexe o comprovante do Pix:
           </label>
           <input type="file" id="pixReceiptInput" accept="image/*,.pdf" />
-          <button type="button" id="btnVerifyPix" class="btn-modal-primary" style="width: 100%; margin-top: 12px;" disabled>
-            <i class="fa-solid fa-check"></i> Confirmar Pagamento, Salvar no SGBD e Publicar Anúncio
-          </button>
+
+          <div style="display: flex; gap: 10px; margin-top: 14px;">
+            <button type="button" id="btnCancelModal" style="flex: 1; background: #64748b; color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">
+              <i class="fa-solid fa-arrow-left"></i> Voltar / Sair
+            </button>
+            <button type="button" id="btnVerifyPix" class="btn-modal-primary" style="flex: 2;" disabled>
+              <i class="fa-solid fa-check"></i> Confirmar Pagamento e Publicar
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -218,8 +231,6 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
