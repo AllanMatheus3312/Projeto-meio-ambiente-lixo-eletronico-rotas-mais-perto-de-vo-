@@ -294,16 +294,16 @@ function handleSearch() {
 }
 
 const PIX_KEY = "254d5227-0a94-4950-9da0-c1ac36dac043";
-let selectedPlanAmount = "30.00";
+let selectedPlanAmount = "35.00";
 let globalVipAd = null;
 
 function normalizePixAmount(amount) {
   const parsed = Number(String(amount).replace(',', '.'));
-  if (isNaN(parsed) || parsed <= 0) return "30.00";
+  if (isNaN(parsed) || parsed <= 0) return "35.00";
   return parsed.toFixed(2);
 }
 
-function generatePixPayload(key, amount = "30.00", merchantName = "LIXO ELETRONICO LONDRINA", city = "LONDRINA") {
+function generatePixPayload(key, amount = "35.00", merchantName = "LIXO ELETRONICO LONDRINA", city = "LONDRINA") {
   const formattedAmount = normalizePixAmount(amount);
   const formatField = (id, value) => id + String(value.length).padStart(2, '0') + value;
   const merchantAccount = formatField("00", "br.gov.bcb.pix") + formatField("01", key);
@@ -599,7 +599,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (sponsorsGrid) {
       sponsorsGrid.innerHTML = '';
-      const midAds = validAds.filter(ad => Number(ad.planAmount) === 30.00);
+      const midAds = validAds.filter(ad => Number(ad.planAmount) === 35.00);
 
       midAds.forEach(ad => {
         const card = document.createElement('div');
@@ -625,7 +625,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (footerSponsorsGrid) {
       footerSponsorsGrid.innerHTML = '';
-      const footerAds = validAds.filter(ad => Number(ad.planAmount) === 15.00);
+      const footerAds = validAds.filter(ad => Number(ad.planAmount) === 15.87);
 
       footerAds.forEach(ad => {
         const card = document.createElement('div');
