@@ -1,239 +1,182 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="referrer" content="no-referrer-when-downgrade">
-  <title>Lixo Eletrônico 2.0 - Londrina</title>
-  
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <link rel="stylesheet" href="style.css?v=5">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Waste Londrina - Descarte Eletrônico e Parcerias</title>
+    <style>
+        :root {
+            --primary-green: #0A5C36;
+            --forest-green: #145A32;
+            --accent-green: #27AE60;
+            --light-bg: #F4F6F5;
+            --dark-text: #2C3E50;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+        }
+
+        header {
+            background-color: var(--primary-green);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .vip-banner {
+            background: linear-gradient(135deg, var(--forest-green), var(--accent-green));
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1em;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            color: var(--primary-green);
+        }
+
+        .pix-box {
+            background: #E8F8F5;
+            border: 2px dashed var(--accent-green);
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .pix-key {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--forest-green);
+            word-break: break-all;
+        }
+
+        form label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        form input, form select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: var(--accent-green);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            margin-top: 20px;
+            font-size: 1em;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #219653;
+        }
+
+        .privacy-notice {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+    </style>
 </head>
 <body>
 
-  <header class="hero-banner">
-    <div class="banner-container">
-      <span class="tag">CONSCIENTIZAÇÃO AMBIENTAL</span>
-      <h1>Lixo Eletrônico 2.0</h1>
-      <h1 class="sub-title-plant">Vamos Cuidar Melhor do Nosso Planeta</h1>
-      
-      <p class="importance-text">
-        <strong>Por que não jogar no lixo reciclado comum?</strong><br>
-        Equipamentos eletrônicos possuem metais pesados (como chumbo, mercúrio e cádmio). Quando misturados ao lixo reciclável comum, contaminam o solo e os lençóis freáticos. O descarte deve ser feito <strong>exclusivamente nos Pontos de Coleta Eletrônica</strong>.
-      </p>
-
-      <div class="search-area">
-        <button id="btnGeo" type="button" class="btn-location">
-          <i class="fa-solid fa-location-crosshairs"></i> Encontrar Mais Próximo
-        </button>
-        <div class="search-input-wrapper">
-          <input type="text" id="searchInput" placeholder="Ou digite seu bairro/endereço..." />
-          <button id="btnSearch" type="button" class="btn-primary">
-            <i class="fa-solid fa-magnifying-glass"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <section class="ads-section container">
-    <div class="ads-cta-banner">
-      <div class="ads-cta-text">
-        <span class="ads-badge"><i class="fa-solid fa-bullhorn"></i> ESPAÇO PATROCINADO • R$ 35,00 (30 DIAS)</span>
-        <h3>Divulgue sua Empresa ou Trabalho Aqui!</h3>
-        <p>Aceita vários anunciantes simultaneamente. Paga uma vez, fica no ar por <strong>30 dias (1 mês)</strong> com expiração automática e segurança garantida.</p>
-      </div>
-      <button type="button" class="btn-advertise" onclick="openAdModalWithPrice('35.00', 'Plano Intermediário - 30 Dias (R$ 35,00)')">
-        <i class="fa-solid fa-rocket"></i> Anunciar por R$ 35,00
-      </button>
+    <div class="vip-banner">
+        🌿 Anuncie seu negócio sustentável em Londrina - Planos de Destaque Disponíveis!
     </div>
 
-    <div id="sponsorsGrid" class="sponsors-grid"></div>
-  </section>
+    <header>
+        <h1>E-Waste Londrina</h1>
+        <p>Encontre pontos de descarte eletrônico e parceiros sustentáveis na cidade</p>
+    </header>
 
-  <section class="info-section container">
-    <h2>Entenda o Descarte Correto</h2>
-    
-    <div class="info-grid">
-      <div class="info-card is-e-waste">
-        <h3><i class="fa-solid fa-circle-check"></i> O que É Lixo Eletrônico?</h3>
-        <ul>
-          <li>Computadores, notebooks, monitores e mouses</li>
-          <li>Celulares, tablets, carregadores e cabos</li>
-          <li>Televisores, rádios, consoles e fones</li>
-          <li>Pilhas, baterias portáteis e eletrodomésticos</li>
-        </ul>
-      </div>
-
-      <div class="info-card not-e-waste">
-        <h3><i class="fa-solid fa-circle-xmark"></i> O que NÃO É Lixo Eletrônico?</h3>
-        <ul>
-          <li>Lixo orgânico (restos de alimentos)</li>
-          <li>Embalagens de plástico, papelão e garrafas PET</li>
-          <li>Vidros, latas de alumínio e talheres</li>
-          <li>Lâmpadas fluorescentes, medicamentos e tintas</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="photos-container">
-      <div class="photo-box">
-        <img src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=600&q=80" 
-             alt="Ponto de Descarte de Eletrônicos" 
-             onerror="this.onerror=null; this.parentElement.classList.add('img-fallback'); this.remove();">
-        <span>Ponto de Coleta Específico</span>
-      </div>
-      <div class="photo-box">
-        <img src="https://images.unsplash.com/photo-1550009158-9ebf69173e03?auto=format&fit=crop&w=600&q=80" 
-             alt="Descarte de Equipamentos e Baterias" 
-             onerror="this.onerror=null; this.parentElement.classList.add('img-fallback'); this.remove();">
-        <span>Coleta de Equipamentos e Baterias</span>
-      </div>
-    </div>
-  </section>
-
-  <main class="results-section" id="resultsSection">
     <div class="container">
-      <div id="statusMessage" class="status-box">
-        Exibindo todos os pontos de coleta de lixo eletrônico em Londrina. Clique em <strong>"Encontrar Mais Próximo"</strong> para traçar a rota no mapa.
-      </div>
-
-      <div class="layout-grid">
-        <div class="places-list" id="placesList"></div>
-
-        <div class="map-wrapper">
-          <div id="map"></div>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <section class="footer-ads-section container">
-    <div class="ads-cta-banner footer-banner-style">
-      <div class="ads-cta-text">
-        <span class="ads-badge" style="background:#0284c7; color:#fff;"><i class="fa-solid fa-tag"></i> PLANO ECONÔMICO • R$ 15,87 (30 DIAS)</span>
-        <h3>Quer Divulgar com Menor Custo?</h3>
-        <p>Cadastre sua empresa no plano básico de R$ 15,87. Fica em destaque exclusivo no <strong>fim da página</strong> por 30 dias.</p>
-      </div>
-      <button type="button" class="btn-advertise" style="background:#0284c7; color:#fff;" onclick="openAdModalWithPrice('15.87', 'Plano Básico - 30 Dias (R$ 15,87)')">
-        <i class="fa-solid fa-bolt"></i> Anunciar por R$ 15,87
-      </button>
-    </div>
-
-    <div id="footerSponsorsGrid" class="sponsors-grid" style="margin-top: 20px;"></div>
-  </section>
-
-  <div id="floatingVipBanner" class="floating-vip-banner">
-    <div class="floating-drag-handle" id="vipDragHandle" title="Arraste para mover o banner VIP">
-      <span><i class="fa-solid fa-up-down-left-right"></i> ARRASTAR PLANO VIP EXCLUSIVO (R$ 115,00)</span>
-    </div>
-    <div class="floating-content">
-      <div class="floating-text">
-        <span class="ads-badge" style="background:#164e43; color:#e6fffa;"><i class="fa-solid fa-crown"></i> PLANO VIP ÚNICO • R$ 115,00 (30 DIAS)</span>
-        <div id="vipImageContainer" style="margin-top: 8px;"></div>
-        <div id="vipStatusDisplay" style="margin-top: 6px; font-size: 0.9rem; color: #e2e8f0;">
-          Carregando status da vaga VIP...
-        </div>
-      </div>
-      <button type="button" id="btnVipAction" class="btn-advertise" style="background:#20c997; color:#0f172a; padding:12px 20px; font-size:1rem; width:100%; justify-content:center;" onclick="tryOpenVipPlan()">
-        <i class="fa-solid fa-star"></i> Garantir Vaga VIP por R$ 115,00
-      </button>
-    </div>
-  </div>
-
-  <div id="adPaymentModal" class="custom-overlay" style="display: none;">
-    <div class="custom-modal modal-lg">
-      <button id="btnCloseAdModal" type="button" class="btn-close-modal">&times;</button>
-
-      <div id="stepPixPayment">
-        <span class="ads-badge" id="modalPlanBadge">PASSO 1 DE 2</span>
-        <h3 id="modalPlanTitle">Libere seu Acesso via Pix</h3>
-        <p class="modal-subtitle">
-          Preencha seus dados comerciais, anexe a imagem da sua empresa, informe seu link e realize o pagamento via Pix com valor automático. Para sua segurança e do site, o comprovante e os dados da transação são armazenados para comprovação de vigência do plano.
-        </p>
-
-        <form id="pixDataForm" class="marketing-form" style="margin-bottom: 20px; text-align: left; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
-          <div class="form-group" style="margin-bottom: 12px;">
-            <label for="inputUserName" style="font-size:0.85rem; font-weight:bold; color:#334155;">Seu Nome (Anunciante):</label>
-            <input type="text" id="inputUserName" placeholder="Ex: João da Silva" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px;" />
-            <div class="checkbox-wrapper" style="margin-top: 4px;">
-              <label style="font-size:0.78rem; color:#64748b; font-weight:normal; cursor:pointer;">
-                <input type="checkbox" id="inputHideName" /> Ocultar meu nome pessoal para os outros usuários
-              </label>
-            </div>
-          </div>
-
-          <div class="form-group" style="margin-bottom: 12px;">
-            <label for="inputBizName" style="font-size:0.85rem; font-weight:bold; color:#334155;">Nome da Empresa (Visível para Todos): *</label>
-            <input type="text" id="inputBizName" placeholder="Ex: Eletrônicos Londrina" required style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px;" />
-          </div>
-
-          <div class="form-group" style="margin-bottom: 12px;">
-            <label for="inputBizCategory" style="font-size:0.85rem; font-weight:bold; color:#334155;">Área de Atuação: *</label>
-            <input type="text" id="inputBizCategory" placeholder="Ex: Reciclagem e Assistência Técnica" required style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px;" />
-          </div>
-
-          <div class="form-group" style="margin-bottom: 12px;">
-            <label for="inputBizDesc" style="font-size:0.85rem; font-weight:bold; color:#334155;">Descrição do Trabalho / Promoção: *</label>
-            <textarea id="inputBizDesc" rows="2" placeholder="Descreva seu trabalho..." required style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px;"></textarea>
-          </div>
-
-          <div class="form-group" style="margin-bottom: 12px;">
-            <label for="inputBizLink" style="font-size:0.85rem; font-weight:bold; color:#334155;">Link de Contato (WhatsApp, Instagram ou Site): *</label>
-            <input type="url" id="inputBizLink" placeholder="https://instagram.com/suaempresa ou https://wa.me/..." required style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px;" />
-          </div>
-
-          <div class="form-group">
-            <label for="inputBizImage" style="font-size:0.85rem; font-weight:bold; color:#047857;">
-              <i class="fa-solid fa-image"></i> Imagem / Banner / Logo da Empresa (Obrigatório): *
-            </label>
-            <input type="file" id="inputBizImage" accept="image/*" required style="font-size:0.85rem; margin-top:4px; display:block; width:100%;" />
-          </div>
-        </form>
+        <h2>Área de Anunciantes & Planos de Parceria</h2>
+        <p>Quer colocar sua empresa em destaque para quem busca descarte consciente em Londrina? Escolha seu plano e faça o pagamento via Pix.</p>
 
         <div class="pix-box">
-          <img id="pixQrImage" src="" alt="QR Code Pix" class="pix-qr" />
-          <div class="pix-details">
-            <div id="pixExactAmountDisplay" style="font-size: 1rem; font-weight: bold; color: #047857; margin-bottom: 6px;">
-              Valor Automático no Pix: R$ 35,00
-            </div>
-            <label style="display: block;">Código Pix Copia e Cola (Valor já incluso):</label>
-            <div class="pix-copy-row">
-              <input type="text" id="pixPayloadInput" readonly />
-              <button type="button" id="btnCopyPayload" class="btn-copy"><i class="fa-regular fa-copy"></i> Copiar Código</button>
-            </div>
-          </div>
+            <p>Chave Pix (Aleatória) para Pagamento:</p>
+            <div class="pix-key">5fdeb776-815b-451b-95b5-8bda4ac82dfa</div>
+            <p style="font-size: 0.9em; color: #555; margin-top: 5px;">Titular: Allan Matheus Pereira</p>
         </div>
 
-        <div class="pix-confirm-area">
-          <label for="pixTxIdInput" class="receipt-label">
-            <i class="fa-solid fa-hashtag"></i> ID da Transação Pix (EndToEndId - 32 caracteres):
-          </label>
-          <input type="text" id="pixTxIdInput" maxlength="32" placeholder="Ex: E0041696820261116120000000000000" style="width:100%; padding:8px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;" />
+        <form id="adForm">
+            <label for="companyName">Nome da Empresa / Negócio:</label>
+            <input type="text" id="companyName" required placeholder="Ex: Recicla Londrina">
 
-          <label for="pixReceiptInput" class="receipt-label">
-            <i class="fa-solid fa-receipt"></i> Anexe o comprovante do Pix:
-          </label>
-          <input type="file" id="pixReceiptInput" accept="image/*,.pdf" />
+            <label for="planType">Escolha o Plano:</label>
+            <select id="planType" required>
+                <option value="bottom">Rodapé (R$ 15,00)</option>
+                <option value="mid">Meio da Página (R$ 30,00)</option>
+                <option value="sticky">Banner Sticky / Rolagem (R$ 70,00)</option>
+                <option value="annual">Banner Verde Anual (R$ 270,00)</option>
+            </select>
 
-          <div style="display: flex; gap: 10px; margin-top: 14px;">
-            <button type="button" id="btnCancelModal" style="flex: 1; background: #64748b; color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">
-              <i class="fa-solid fa-arrow-left"></i> Voltar / Sair
-            </button>
-            <button type="button" id="btnVerifyPix" class="btn-modal-primary" style="flex: 2;" disabled>
-              <i class="fa-solid fa-check"></i> Confirmar Pagamento e Publicar
-            </button>
-          </div>
+            <label for="endToEndId">Código EndToEndId do Pix (Comprovante):</label>
+            <input type="text" id="endToEndId" required placeholder="Cole aqui os 32 caracteres do ID do Pix">
+
+            <label for="receiptFile">Anexar Comprovante (Imagem):</label>
+            <input type="file" id="receiptFile" accept="image/*" required>
+
+            <button type="submit">Enviar Comprovante para Validação</button>
+        </form>
+
+        <div class="privacy-notice">
+            <strong>Nota de Privacidade e Segurança:</strong> Em conformidade com as normas locais, os dados comerciais informados e os identificadores de transação (EndToEndId) são armazenados localmente (`localStorage`) para fins estritamente contratuais e de auditoria de segurança de pagamentos. Nenhum dado sensível é compartilhado com terceiros.
         </div>
-      </div>
     </div>
-  </div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
-  <script src="script.js?v=5"></script>
+    <script>
+        document.getElementById('adForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const company = document.getElementById('companyName').value;
+            const plan = document.getElementById('planType').value;
+            const txId = document.getElementById('endToEndId').value;
+            
+            // Salvando no histórico permanente local para auditoria
+            const historico = JSON.parse(localStorage.getItem('lixo_eletronico_historico_permanente') || '[]');
+            historico.push({
+                empresa: company,
+                plano: plan,
+                endToEndId: txId,
+                data: new Date().toISOString()
+            });
+            localStorage.setItem('lixo_eletronico_historico_permanente', JSON.stringify(historico));
+
+            alert('Comprovante e dados enviados com sucesso! Seu anúncio passará por validação manual e será ativado em breve.');
+            document.getElementById('adForm').reset();
+        });
+    </script>
+
 </body>
 </html>
