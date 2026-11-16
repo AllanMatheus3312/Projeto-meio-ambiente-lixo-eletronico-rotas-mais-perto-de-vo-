@@ -41,11 +41,11 @@
   <section class="ads-section container">
     <div class="ads-cta-banner">
       <div class="ads-cta-text">
-        <span class="ads-badge"><i class="fa-solid fa-bullhorn"></i> ESPAÇO PATROCINADO • R$ 30,00</span>
+        <span class="ads-badge"><i class="fa-solid fa-bullhorn"></i> ESPAÇO PATROCINADO • R$ 30,00 (PLANO MENSAL)</span>
         <h3>Divulgue sua Empresa ou Trabalho Aqui!</h3>
-        <p>Alcance moradores de Londrina engajados com sustentabilidade e tecnologia. Seu anúncio fica visível para todos os visitantes após o pagamento de R$ 30,00 via Pix.</p>
+        <p>Alcance moradores de Londrina engajados com sustentabilidade e tecnologia. Pagamento único via Pix com duração de <strong>1 mês (30 dias)</strong>.</p>
       </div>
-      <button type="button" class="btn-advertise" onclick="openAdModalWithPrice('30.00', 'Plano Intermediário (R$ 30,00)')">
+      <button type="button" class="btn-advertise" onclick="openAdModalWithPrice('30.00', 'Plano Intermediário - Duração 1 Mês (R$ 30,00)')">
         <i class="fa-solid fa-rocket"></i> Anunciar por R$ 30,00
       </button>
     </div>
@@ -113,23 +113,26 @@
   <section class="footer-ads-section container">
     <div class="ads-cta-banner footer-banner-style">
       <div class="ads-cta-text">
-        <span class="ads-badge" style="background:#0284c7; color:#fff;"><i class="fa-solid fa-tag"></i> PLANO ECONÔMICO • R$ 15,00</span>
+        <span class="ads-badge" style="background:#0284c7; color:#fff;"><i class="fa-solid fa-tag"></i> PLANO ECONÔMICO • R$ 15,00 (PLANO MENSAL)</span>
         <h3>Quer Divulgar com Menor Custo?</h3>
-        <p>Cadastre sua empresa no plano básico de R$ 15,00 e apareça também no mural de patrocínios da nossa página.</p>
+        <p>Cadastre sua empresa no plano básico de R$ 15,00 (válido por <strong>1 mês</strong>) e apareça no mural de patrocínios.</p>
       </div>
-      <button type="button" class="btn-advertise" style="background:#0284c7; color:#fff;" onclick="openAdModalWithPrice('15.00', 'Plano Básico (R$ 15,00)')">
+      <button type="button" class="btn-advertise" style="background:#0284c7; color:#fff;" onclick="openAdModalWithPrice('15.00', 'Plano Básico - Duração 1 Mês (R$ 15,00)')">
         <i class="fa-solid fa-bolt"></i> Anunciar por R$ 15,00
       </button>
     </div>
   </section>
 
   <div id="floatingVipBanner" class="floating-vip-banner">
+    <div class="floating-drag-handle" id="vipDragHandle" title="Arraste para mover">
+      <span><i class="fa-solid fa-up-down-left-right"></i> Arrastar</span>
+    </div>
     <div class="floating-content">
       <div class="floating-text">
-        <span class="ads-badge" style="background:#7c3aed; color:#fff;"><i class="fa-solid fa-crown"></i> PLANO VIP DESTAQUE • R$ 70,00</span>
-        <p>Destaque máximo no topo do mural para sua empresa!</p>
+        <span class="ads-badge" style="background:#7c3aed; color:#fff;"><i class="fa-solid fa-crown"></i> PLANO VIP • R$ 70,00 (1 MÊS)</span>
+        <p>Destaque máximo no topo durante <strong>1 mês inteiro</strong>!</p>
       </div>
-      <button type="button" class="btn-advertise" style="background:#7c3aed; color:#fff; padding:8px 14px; font-size:0.9rem;" onclick="openAdModalWithPrice('70.00', 'Plano VIP Destaque (R$ 70,00)')">
+      <button type="button" class="btn-advertise" style="background:#7c3aed; color:#fff; padding:8px 14px; font-size:0.85rem;" onclick="openAdModalWithPrice('70.00', 'Plano VIP Destaque - Duração 1 Mês (R$ 70,00)')">
         <i class="fa-solid fa-star"></i> Destacar por R$ 70,00
       </button>
     </div>
@@ -142,18 +145,14 @@
       <div id="stepPixPayment">
         <span class="ads-badge" id="modalPlanBadge">PASSO 1 DE 2</span>
         <h3 id="modalPlanTitle">Libere seu Acesso via Pix</h3>
-        <p class="modal-subtitle">Escaneie o QR Code ou copie o código Pix abaixo. Após o pagamento, informe o ID da transação e anexe o comprovante.</p>
+        <p class="modal-subtitle">
+          Escaneie o QR Code ou copie o código Pix Copia e Cola abaixo. Seu anúncio fica ativo por <strong>1 mês (30 dias)</strong> e sai automaticamente ao final do período. Após pagar, informe o ID da transação e anexe o comprovante.
+        </p>
 
         <div class="pix-box">
           <img id="pixQrImage" src="" alt="QR Code Pix" class="pix-qr" />
           <div class="pix-details">
-            <label>Sua Chave Pix:</label>
-            <div class="pix-copy-row">
-              <input type="text" id="pixKeyInput" value="SUA_CHAVE_PIX_AQUI" readonly />
-              <button type="button" id="btnCopyPixKey" class="btn-copy"><i class="fa-regular fa-copy"></i> Copiar Chave</button>
-            </div>
-
-            <label style="margin-top: 10px; display: block;">Código Pix Copia e Cola:</label>
+            <label style="display: block;">Código Pix Copia e Cola:</label>
             <div class="pix-copy-row">
               <input type="text" id="pixPayloadInput" readonly />
               <button type="button" id="btnCopyPayload" class="btn-copy"><i class="fa-regular fa-copy"></i> Copiar Código</button>
@@ -163,24 +162,24 @@
 
         <div class="pix-confirm-area">
           <label for="pixTxIdInput" class="receipt-label">
-            <i class="fa-solid fa-hashtag"></i> ID da Transação Pix:
+            <i class="fa-solid fa-hashtag"></i> ID da Transação Pix (EndToEndId - 32 caracteres):
           </label>
-          <input type="text" id="pixTxIdInput" placeholder="Ex: E123456782026..." style="width:100%; padding:8px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;" />
+          <input type="text" id="pixTxIdInput" maxlength="32" placeholder="Ex: E0041696820261116120000000000000" style="width:100%; padding:8px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;" />
 
           <label for="pixReceiptInput" class="receipt-label">
             <i class="fa-solid fa-receipt"></i> Anexe o comprovante do Pix:
           </label>
           <input type="file" id="pixReceiptInput" accept="image/*,.pdf" />
           <button type="button" id="btnVerifyPix" class="btn-modal-primary" style="width: 100%; margin-top: 12px;" disabled>
-            <i class="fa-solid fa-unlock"></i> Confirmar Pix e Liberar Divulgação
+            <i class="fa-solid fa-unlock"></i> Confirmar Pagamento e Liberar Divulgação
           </button>
         </div>
       </div>
 
       <div id="stepMarketingForm" style="display: none;">
-        <span class="ads-badge" style="background:#10b981; color:#fff;">ACESSO LIBERADO • PASSO 2 DE 2</span>
+        <span class="ads-badge" style="background:#10b981; color:#fff;">PAGAMENTO VALIDADO • DURAÇÃO: 1 MÊS</span>
         <h3>Cadastre sua Empresa ou Trabalho</h3>
-        <p class="modal-subtitle">Preencha os dados abaixo para publicar seu marketing para todos os visitantes do site.</p>
+        <p class="modal-subtitle">Preencha os dados abaixo para publicar seu anúncio por <strong>1 mês (30 dias)</strong>.</p>
 
         <form id="marketingForm" class="marketing-form">
           <input type="text" id="bizName" placeholder="Nome da Empresa ou Profissional *" required />
@@ -194,7 +193,7 @@
           </label>
 
           <button type="submit" id="btnPublishAd" class="btn-modal-primary" style="width: 100%;">
-            <i class="fa-solid fa-check"></i> Publicar Anúncio para Todos
+            <i class="fa-solid fa-check"></i> Publicar Anúncio por 1 Mês
           </button>
         </form>
       </div>

@@ -238,14 +238,16 @@ function handleSearch() {
   statusMsg.innerHTML = `Encontrado(s) <strong>${filtered.length}</strong> ponto(s) para "<em>${query}</em>".`;
 }
 
-const PIX_KEY = "SUA_CHAVE_PIX_AQUI";
+const PIX_KEY = "254d5227-0a94-4950-9da0-c1ac36dac043";
+let selectedPlanAmount = "30.00";
 
 window.openAdModalWithPrice = function(amount, planTitle) {
   const adModal = document.getElementById('adPaymentModal');
   const stepPix = document.getElementById('stepPixPayment');
   const stepForm = document.getElementById('stepMarketingForm');
+  selectedPlanAmount = amount;
   
-  document.getElementById('modalPlanBadge').innerText = `PLANO SELECIONADO • VALOR: R$ ${amount}`;
+  document.getElementById('modalPlanBadge').innerText = `PLANO SELECIONADO • VALOR: R$ ${amount} • DURAÇÃO 1 MÊS`;
   document.getElementById('modalPlanTitle').innerText = planTitle;
 
   const payload = generatePixPayload(PIX_KEY, amount);
@@ -253,7 +255,7 @@ window.openAdModalWithPrice = function(amount, planTitle) {
   document.getElementById('pixQrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(payload)}`;
 
   adModal.style.display = 'flex';
-  if (getCookie('pix_paid_unlocked') === 'true') {
+  if (getCookie('pix_paid_unlocked') === 'true' && sessionStorage.getItem('current_pix_txid')) {
     stepPix.style.display = 'none';
     stepForm.style.display = 'block';
   } else {
@@ -262,7 +264,7 @@ window.openAdModalWithPrice = function(amount, planTitle) {
   }
 };
 
-function generatePixPayload(key, amount = "30.00", merchantName = "ANUNCIANTE", city = "LONDRINA") {
+function generatePixPayload(key, amount = "30.00", merchantName = "LIXO ELETRONICO LONDRINA", city = "LONDRINA") {
   const formatField = (id, value) => id + String(value.length).padStart(2, '0') + value;
   const merchantAccount = formatField("00", "br.gov.bcb.pix") + formatField("01", key);
   let payload =
@@ -296,6 +298,73 @@ function setCookie(name, value, days) {
 function getCookie(name) {
   const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
   return match ? match[2] : null;
+}
+
+function isValidEndToEndPixId(txId) {
+  return /^E[0-9]{8}[0-9]{12}[a-zA-Z0-9]{11}$/.test(txId);
+}
+
+function makeVipBannerDraggable() {
+  const banner = document.getElementById('floatingVipBanner');
+  const handle = document.getElementById('vipDragHandle');
+  if (!banner || !handle) return;
+
+  let isDragging = false;
+  let offsetX = 0;
+  let offsetY = 0;
+
+  const startDrag = (clientX, clientY) => {
+    isDragging = true;
+    const rect = banner.getBoundingClientRect();
+    offsetX = clientX - rect.left;
+    offsetY = clientY - rect.top;
+    banner.style.bottom = 'auto';
+    banner.style.right = 'auto';
+    banner.style.left = rect.left + 'px';
+    banner.style.top = rect.top + 'px';
+  };
+
+  const onDrag = (clientX, clientY) => {
+    if (!isDragging) return;
+    let newLeft = clientX - offsetX;
+    let newTop = clientY - offsetY;
+    const maxLeft = window.innerWidth - banner.offsetWidth;
+    const maxTop = window.innerHeight - banner.offsetHeight;
+    newLeft = Math.max(0, Math.min(newLeft, maxLeft));
+    newTop = Math.max(0, Math.min(newTop, maxTop));
+    banner.style.left = newLeft + 'px';
+    banner.style.top = newTop + 'px';
+  };
+
+  const stopDrag = () => {
+    isDragging = false;
+  };
+
+  handle.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    startDrag(e.clientX, e.clientY);
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    onDrag(e.clientX, e.clientY);
+  });
+
+  document.addEventListener('mouseup', stopDrag);
+
+  handle.addEventListener('touchstart', (e) => {
+    if (e.touches.length > 0) {
+      startDrag(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchmove', (e) => {
+    if (isDragging && e.touches.length > 0) {
+      e.preventDefault();
+      onDrag(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, { passive: false });
+
+  document.addEventListener('touchend', stopDrag);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -365,6 +434,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   initMap();
+  makeVipBannerDraggable();
 
   document.getElementById('btnGeo').addEventListener('click', getUserLocation);
   document.getElementById('btnSearch').addEventListener('click', handleSearch);
@@ -398,14 +468,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  const btnCopyKey = document.getElementById('btnCopyPixKey');
-  if (btnCopyKey) {
-    btnCopyKey.addEventListener('click', () => {
-      navigator.clipboard.writeText(PIX_KEY);
-      alert('Chave Pix copiada: ' + PIX_KEY);
-    });
-  }
-
   const btnCopyPayload = document.getElementById('btnCopyPayload');
   if (btnCopyPayload) {
     btnCopyPayload.addEventListener('click', () => {
@@ -418,7 +480,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function checkPixInputs() {
     if (!receiptInput || !txIdInput || !btnVerifyPix) return;
     const hasReceipt = receiptInput.files.length > 0;
-    const hasValidTxId = txIdInput.value.trim().length >= 10;
+    const hasValidTxId = isValidEndToEndPixId(txIdInput.value.trim());
     btnVerifyPix.disabled = !(hasReceipt && hasValidTxId);
   }
 
@@ -428,21 +490,35 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnVerifyPix) {
     btnVerifyPix.addEventListener('click', async () => {
       const txId = txIdInput.value.trim();
+
+      if (!isValidEndToEndPixId(txId)) {
+        alert('ID de transação Pix inválido. Informe o código EndToEndId oficial de 32 caracteres iniciado com a letra E.');
+        return;
+      }
+
       btnVerifyPix.disabled = true;
-      btnVerifyPix.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Validando ID do Pix...';
+      btnVerifyPix.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verificando pagamento no Mercado Pago...';
+
+      const usedTxIds = JSON.parse(localStorage.getItem('used_pix_txids') || '[]');
+      if (usedTxIds.includes(txId)) {
+        alert('Este ID de transação Pix já foi utilizado. Cada pagamento único garante 1 mês de divulgação.');
+        btnVerifyPix.innerHTML = '<i class="fa-solid fa-unlock"></i> Confirmar Pagamento e Liberar Divulgação';
+        btnVerifyPix.disabled = false;
+        return;
+      }
 
       if (db) {
         const existing = await db.collection('anuncios_pagos').where('txId', '==', txId).get();
         if (!existing.empty) {
-          alert('Este ID de transação Pix já foi utilizado anteriormente.');
-          btnVerifyPix.innerHTML = '<i class="fa-solid fa-unlock"></i> Confirmar Pix e Liberar Divulgação';
+          alert('Este ID de transação Pix já está vinculado a um anúncio ativo.');
+          btnVerifyPix.innerHTML = '<i class="fa-solid fa-unlock"></i> Confirmar Pagamento e Liberar Divulgação';
           btnVerifyPix.disabled = false;
           return;
         }
       }
 
       setTimeout(() => {
-        setCookie('pix_paid_unlocked', 'true', 7);
+        setCookie('pix_paid_unlocked', 'true', 30);
         sessionStorage.setItem('current_pix_txid', txId);
         stepPix.style.display = 'none';
         stepForm.style.display = 'block';
@@ -454,13 +530,16 @@ document.addEventListener('DOMContentLoaded', () => {
   function drawAdsCards(adsList) {
     if (!sponsorsGrid) return;
     sponsorsGrid.innerHTML = '';
-    adsList.forEach(ad => {
+    const now = Date.now();
+    const activeAds = adsList.filter(ad => !ad.expiresAt || ad.expiresAt > now);
+
+    activeAds.forEach(ad => {
       const card = document.createElement('div');
       card.className = 'sponsor-card';
       card.innerHTML = `
         ${ad.image ? `<img src="${ad.image}" alt="${ad.name}">` : ''}
         <div class="sponsor-card-body">
-          <span class="sponsor-cat">${ad.category} • Patrocinado</span>
+          <span class="sponsor-cat">${ad.category} • Patrocinado (1 Mês)</span>
           <h4>${ad.name}</h4>
           <p>${ad.desc}</p>
           <a href="${ad.link}" target="_blank" rel="noopener noreferrer" class="sponsor-link">
@@ -510,16 +589,25 @@ document.addEventListener('DOMContentLoaded', () => {
   if (marketingForm) {
     marketingForm.addEventListener('submit', (e) => {
       e.preventDefault();
+
+      const txId = sessionStorage.getItem('current_pix_txid');
+      if (!txId || !isValidEndToEndPixId(txId)) {
+        alert('Pagamento Pix não identificado. Realize o pagamento antes de publicar.');
+        stepForm.style.display = 'none';
+        stepPix.style.display = 'block';
+        return;
+      }
+
       const btnPublish = document.getElementById('btnPublishAd');
       btnPublish.disabled = true;
-      btnPublish.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Publicando para todos...';
+      btnPublish.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Publicando por 1 mês...';
 
       const name = document.getElementById('bizName').value.trim();
       const category = document.getElementById('bizCategory').value.trim();
       const desc = document.getElementById('bizDesc').value.trim();
       const link = document.getElementById('bizLink').value.trim();
-      const txId = sessionStorage.getItem('current_pix_txid') || 'PIX-' + Date.now();
       const imgFile = document.getElementById('bizImage').files.length > 0 ? document.getElementById('bizImage').files[0] : null;
+      const oneMonthMs = 30 * 24 * 60 * 60 * 1000;
 
       const saveAd = async (imgData) => {
         const adData = {
@@ -529,8 +617,14 @@ document.addEventListener('DOMContentLoaded', () => {
           link,
           image: imgData,
           txId,
-          createdAt: Date.now()
+          planAmount: selectedPlanAmount,
+          createdAt: Date.now(),
+          expiresAt: Date.now() + oneMonthMs
         };
+
+        const usedTxIds = JSON.parse(localStorage.getItem('used_pix_txids') || '[]');
+        usedTxIds.push(txId);
+        localStorage.setItem('used_pix_txids', JSON.stringify(usedTxIds));
 
         if (db) {
           await db.collection('anuncios_pagos').add(adData);
@@ -547,9 +641,9 @@ document.addEventListener('DOMContentLoaded', () => {
         txIdInput.value = '';
         receiptInput.value = '';
         btnVerifyPix.disabled = true;
-        btnVerifyPix.innerHTML = '<i class="fa-solid fa-unlock"></i> Confirmar Pix e Liberar Divulgação';
+        btnVerifyPix.innerHTML = '<i class="fa-solid fa-unlock"></i> Confirmar Pagamento e Liberar Divulgação';
         btnPublish.disabled = false;
-        btnPublish.innerHTML = '<i class="fa-solid fa-check"></i> Publicar Anúncio para Todos';
+        btnPublish.innerHTML = '<i class="fa-solid fa-check"></i> Publicar Anúncio por 1 Mês';
         adModal.style.display = 'none';
       };
 
