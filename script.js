@@ -1,7 +1,7 @@
 const eWastePlaces = [
   {
     id: 1,
-    name: "PEV Jardim Califórnia (CMTU / Prefeitura de Londrina)",
+    name: "PEV Jardim Califórnia (CMTU / Prefeitura)",
     address: "Rua São Salvador, 110 - Jardim Califórnia, Londrina - PR",
     hours: "Seg a Sex 08h-17h | Sáb 08h-12h",
     lat: -23.3324,
@@ -25,7 +25,7 @@ const eWastePlaces = [
   },
   {
     id: 4,
-    name: "E-Coleta Reciclagem de Eletrônicos Londrina",
+    name: "E-Coleta Reciclagem de Eletrônicos",
     address: "Rua Santa Rita, 5 - Jardim Maria Lúcia, Londrina - PR",
     hours: "Seg a Sex 09h-18h | Sáb 09h-12h",
     lat: -23.2751,
@@ -88,7 +88,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 }
 
 function getGoogleMapsRouteUrl(place) {
-  const destinationQuery = encodeURIComponent(place.address);
+  const destinationQuery = encodeURIComponent(place.name + ", " + place.address);
   if (userLocation) {
     return `https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lng}&destination=${destinationQuery}&travelmode=driving`;
   }
