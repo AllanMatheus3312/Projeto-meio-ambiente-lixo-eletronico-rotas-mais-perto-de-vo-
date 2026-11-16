@@ -209,7 +209,7 @@ function drawRouteToPlace(destLat, destLng, placeName) {
 
   const statusMsg = document.getElementById('statusMessage');
   const originLabel = userLocation ? "sua localização atual" : "o Centro de Londrina";
-  statusMsg.innerHTML = `<i class="fa-solid fa-route" style="color:#0284c7;"></i> Traçando rota de <strong>${originLabel}</strong> até <strong>${placeName}</strong>.`;
+  statusMsg.innerHTML = `<i class="fa-solid fa-route" style="color:#0284c7;"></i> Rota traçada de <strong>${originLabel}</strong> até <strong>${placeName}</strong>.`;
 }
 
 function initMap() {
@@ -251,21 +251,17 @@ function plotMarkers(places) {
     const googleMapsRouteUrl = getGoogleMapsRouteUrl(place);
 
     const distText = place.distance ? `<br><b>Distância:</b> ${place.distance.toFixed(2)} km` : '';
-    const nearestLabel = isNearest ? '<br><span style="color:#059669; font-weight:bold;">★ DESCARTE DE LIXO ELETRÔNICO MAIS PRÓXIMO</span>' : '<br><span style="color:#dc2626; font-weight:bold;">Ponto de Descarte de Lixo Eletrônico</span>';
+    const nearestLabel = isNearest ? '<br><span style="color:#059669; font-weight:bold;">★ PONTO MAIS PRÓXIMO</span>' : '<br><span style="color:#dc2626; font-weight:bold;">Ponto de Coleta</span>';
     
     marker.bindPopup(`
       <b>${place.name}</b>${nearestLabel}<br>
       ${place.address}${distText}<br>
       <div style="margin-top: 8px;">
         <a href="${googleMapsRouteUrl}" target="_blank" rel="noopener noreferrer" style="background:#0284c7; color:#fff; padding:6px 10px; border-radius:6px; text-decoration:none; font-size:11px; font-weight:bold; display:inline-block;">
-          <i class="fa-solid fa-map-location-dot"></i> Abrir Rota no Google Maps
+          <i class="fa-solid fa-map-location-dot"></i> Abrir no Google Maps
         </a>
       </div>
     `);
-
-    if (isNearest) {
-      setTimeout(() => marker.openPopup(), 300);
-    }
 
     marker.on('click', () => {
       drawRouteToPlace(place.lat, place.lng, place.name);
@@ -376,7 +372,7 @@ function getUserLocation() {
 
       const closest = sortedPlaces[0];
       drawRouteToPlace(closest.lat, closest.lng, closest.name);
-      statusMsg.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#10b981;"></i> Rota iniciada! O ponto mais próximo é <strong>${closest.name}</strong> (${closest.distance.toFixed(1)} km de você).`;
+      statusMsg.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#10b981;"></i> Rota automática iniciada para o ponto mais próximo: <strong>${closest.name}</strong> (${closest.distance.toFixed(1)} km).`;
     },
     (error) => {
       statusMsg.innerHTML = "Não foi possível obter sua localização no navegador. Clique em 'Iniciar Rota Aqui' em qualquer ponto abaixo para traçar a partir do Centro.";
