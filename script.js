@@ -1,16 +1,16 @@
 const eWastePlaces = [
   {
     id: 1,
-    name: "ONG E-Letro (CRC Londrina)",
-    address: "Rua Ermelindo Leão, 385 - Vila Casoni, Londrina - PR",
+    name: "CRC E-LETRO (ONG E-Letro)",
+    address: "Rua Ermelindo Leão, 385 - Vila Casoni, Londrina - PR, 86025-150",
     hours: "Seg a Sex 08h-12h e 13h30-18h",
     lat: -23.3036,
     lng: -51.1524
   },
   {
     id: 2,
-    name: "Green Ocean / GD7 Metais Lixo Eletrônico",
-    address: "Av. Alexandre Santoro, 590 - Jardim dos Estados, Londrina - PR",
+    name: "Green Ocean Lixo Eletrônico / GD7 Metais",
+    address: "Av. Alexandre Santoro, 590 - Jardim dos Estados, Londrina - PR, 86083-295",
     hours: "Seg a Sex 08h-18h",
     lat: -23.3150,
     lng: -51.1210
@@ -18,114 +18,114 @@ const eWastePlaces = [
   {
     id: 3,
     name: "E-Coleta Reciclagem Londrina",
-    address: "Rua Benício Camilo, 103 - Jardim Santa Rita, Londrina - PR",
+    address: "Rua Benício Camilo, 103 - Jardim Santa Rita, Londrina - PR, 86072-470",
     hours: "Seg a Sex 09h-18h | Sáb 09h-12h",
     lat: -23.3122,
     lng: -51.2215
   },
   {
     id: 4,
-    name: "Catador Eletrônico",
-    address: "Rua Roberto Romanelli, 2761 - Centro, Cambé - PR",
-    hours: "Seg a Sex 08h-17h",
-    lat: -23.2785,
-    lng: -51.2780
+    name: "Tec Lixo Eletrônico",
+    address: "R. Hikoma Udihara, 230 - Jardim Kobayashi, Londrina - PR, 86040-340",
+    hours: "Seg a Sex 08h-18h",
+    lat: -23.3015,
+    lng: -51.1090
   },
   {
     id: 5,
-    name: "Casas Bahia (Centro)",
-    address: "Av. Paraná, 203 - Centro, Londrina - PR",
-    hours: "Seg a Sáb 09h-19h",
-    lat: -23.3108,
-    lng: -51.1625
-  },
-  {
-    id: 6,
-    name: "Casas Bahia (Benjamin Constant)",
-    address: "Rua Benjamin Constant, 1138 - Centro, Londrina - PR",
-    hours: "Seg a Sáb 09h-19h",
-    lat: -23.3130,
-    lng: -51.1602
-  },
-  {
-    id: 7,
-    name: "Supermercados Angeloni",
-    address: "Rua João Huss, 74 - Gleba Palhano, Londrina - PR",
-    hours: "Seg a Dom 08h-21h",
-    lat: -23.3245,
-    lng: -51.1685
-  },
-  {
-    id: 8,
-    name: "Leroy Merlin Londrina",
-    address: "Av. Theodoro Victorelli, 650 - Jardim Helena, Londrina - PR",
-    hours: "Seg a Sáb 08h-22h | Dom 09h-20h",
-    lat: -23.3198,
-    lng: -51.1320
-  },
-  {
-    id: 9,
-    name: "Kalunga (Shopping Catuaí)",
-    address: "Rod. Celso Garcia Cid, Km 377, 5600 - Gleba Fazenda Palhano, Londrina - PR",
-    hours: "Seg a Sáb 10h-22h | Dom 14h-20h",
-    lat: -23.3512,
-    lng: -51.1770
-  },
-  {
-    id: 10,
-    name: "Kalunga (Boulevard Londrina Shopping)",
-    address: "Av. Theodoro Victorelli, 150 - Jardim Helena, Londrina - PR",
+    name: "Ecoponto Boulevard Shopping Londrina",
+    address: "Av. Theodoro Victorelli, 150 (Estacionamento G1) - Carlota, Londrina - PR, 86027-750",
     hours: "Seg a Sáb 10h-22h | Dom 14h-20h",
     lat: -23.3205,
     lng: -51.1335
   },
   {
-    id: 11,
-    name: "Hayamax Distribuidora",
-    address: "Rua Senador Souza Naves, 9 - Centro, Londrina - PR",
+    id: 6,
+    name: "Pontos de Coleta Catuaí Shopping Londrina",
+    address: "Rod. Celso Garcia Cid, 5600 (Próximo ao SAC e fraldário) - Gleba Fazenda Palhano, Londrina - PR, 86050-901",
+    hours: "Seg a Sáb 10h-22h | Dom 14h-20h",
+    lat: -23.3512,
+    lng: -51.1770
+  },
+  {
+    id: 7,
+    name: "Casas Bahia (Ponto Green Eletron)",
+    address: "Av. Paraná, 203 - Centro, Londrina - PR, 86010-390",
+    hours: "Seg a Sáb 09h-19h",
+    lat: -23.3108,
+    lng: -51.1625
+  },
+  {
+    id: 8,
+    name: "Casas Bahia (Ponto Green Eletron)",
+    address: "R. Benjamin Constant, 1138 - Centro, Londrina - PR, 86010-350",
+    hours: "Seg a Sáb 09h-19h",
+    lat: -23.3130,
+    lng: -51.1602
+  },
+  {
+    id: 9,
+    name: "Supermercados Angeloni (Ponto Green Eletron)",
+    address: "R. João Huss, 74 - Gleba Fazenda Palhano, Londrina - PR, 86050-490",
+    hours: "Seg a Dom 08h-21h",
+    lat: -23.3245,
+    lng: -51.1685
+  },
+  {
+    id: 10,
+    name: "Santuário Nossa Senhora Aparecida (Parceria Green Ocean)",
+    address: "Praça Nossa Sra. Aparecida, s/n - Vila Nova, Londrina - PR, 86025-440",
     hours: "Seg a Sex 08h-18h",
-    lat: -23.3082,
-    lng: -51.1578
+    lat: -23.3080,
+    lng: -51.1450
+  },
+  {
+    id: 11,
+    name: "Centro Cultural Kaingang (Parceria Green Ocean)",
+    address: "Av. Dez de Dezembro, 1345 - Vila Recreio, Londrina - PR, 86026-220",
+    hours: "Seg a Sex 08h-18h",
+    lat: -23.3180,
+    lng: -51.1510
   },
   {
     id: 12,
-    name: "Eletrônica Valtech",
-    address: "Rua Belo Horizonte, 177 - Centro, Londrina - PR",
-    hours: "Seg a Sex 08h-18h",
-    lat: -23.3140,
-    lng: -51.1590
+    name: "Leroy Merlin Londrina",
+    address: "Av. Theodoro Victorelli, 650L - Jardim Helena, Londrina - PR, 86027-750",
+    hours: "Seg a Sáb 08h-22h | Dom 09h-20h",
+    lat: -23.3198,
+    lng: -51.1320
   },
   {
     id: 13,
-    name: "Help Fax (Epson)",
-    address: "Rua Quintino Bocaiúva, 662 - Centro, Londrina - PR",
-    hours: "Seg a Sex 08h-18h",
-    lat: -23.3115,
-    lng: -51.1560
+    name: "Condor Hipermercado",
+    address: "R. Rio Grande do Sul, 50 - Matarazzo, Londrina - PR, 86026-080",
+    hours: "Seg a Sáb 08h-21h | Dom 08h-20h",
+    lat: -23.3110,
+    lng: -51.1540
   },
   {
     id: 14,
-    name: "Eletrônica Rolândia",
-    address: "Rua Gustavo Barroso, 1270 - Jardim Shangri-Lá A, Londrina - PR",
+    name: "Iate Clube de Londrina",
+    address: "Av. Higienópolis, 2135 - Higienópolis, Londrina - PR, 86015-010",
     hours: "Seg a Sex 08h-18h",
-    lat: -23.2950,
-    lng: -51.1710
+    lat: -23.3050,
+    lng: -51.1630
   },
   {
     id: 15,
-    name: "PEV CMTU Zona Leste",
-    address: "Rua Capitão João Busse, 1285 - Jardim Califórnia, Londrina - PR",
-    hours: "Seg a Sex 08h-17h | Sáb 08h-12h",
-    lat: -23.3275,
-    lng: -51.1412
+    name: "Prefeitura Municipal de Londrina",
+    address: "Av. Duque de Caxias, 635 - Centro Cívico, Londrina - PR, 86015-901",
+    hours: "Seg a Sex 08h-17h",
+    lat: -23.3220,
+    lng: -51.1550
   },
   {
     id: 16,
-    name: "PEV CMTU Zona Norte",
-    address: "Rua Anníbal Balarotti, s/n - Jardim Vista Bela, Londrina - PR",
-    hours: "Seg a Sex 08h-17h | Sáb 08h-12h",
-    lat: -23.2540,
-    lng: -51.1680
+    name: "Microcamp Londrina",
+    address: "R. Quintino Bocaiúva, 379 - Centro, Londrina - PR, 86020-150",
+    hours: "Seg a Sex 08h-20h | Sáb 08h-15h",
+    lat: -23.3120,
+    lng: -51.1570
   }
 ];
 
@@ -226,7 +226,6 @@ function initMap() {
 
   markersGroup = L.featureGroup().addTo(map);
 
-  // EXECUÇÃO IMEDIATA DA GEOLOCALIZAÇÃO AO ABRIR O MAPA
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -937,4 +936,4 @@ document.addEventListener('DOMContentLoaded', () => {
       compressImage(imgFile, saveAd);
     });
   }
-});
+});S
