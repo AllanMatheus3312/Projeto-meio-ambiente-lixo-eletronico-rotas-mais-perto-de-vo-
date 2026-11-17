@@ -226,6 +226,7 @@ function initMap() {
 
   markersGroup = L.featureGroup().addTo(map);
 
+  // EXECUÇÃO IMEDIATA DA GEOLOCALIZAÇÃO AO ABRIR O MAPA
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -464,6 +465,7 @@ function handleSearch() {
 const PIX_KEY = "5fdeb776-815b-451b-95b5-8bda4ac82dfa";
 let selectedPlanAmount = "35.00";
 let globalVipAd = null;
+let savedDraft = JSON.parse(localStorage.getItem('lixo_eletronico_draft') || '{}');
 
 function normalizePixAmount(amount) {
   const parsed = Number(String(amount).replace(',', '.'));
@@ -515,6 +517,14 @@ window.openAdModalWithPrice = function(amount, planTitle) {
   const payload = generatePixPayload(PIX_KEY, exactAmount);
   document.getElementById('pixPayloadInput').value = payload;
   document.getElementById('pixQrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(payload)}`;
+
+  // TRAVA DE SEGURANÇA: Salva o plano ativo no navegador caso a página feche sem querer
+  localStorage.setItem('lixo_eletronico_active_plan', JSON.stringify({
+    amount: exactAmount,
+    title: planTitle,
+    payload: payload,
+    timestamp: Date.now()
+  }));
 
   adModal.style.display = 'flex';
 };
@@ -686,12 +696,42 @@ document.addEventListener('DOMContentLoaded', () => {
   const bizLinkInput = document.getElementById('inputBizLink');
   const bizImageInput = document.getElementById('inputBizImage');
 
+  // Restaura rascunho de formulário caso o usuário tenha saído sem querer
+  if (savedDraft.userName) document.getElementById('inputUserName').value = savedDraft.userName;
+  if (savedDraft.hideName !== undefined) document.getElementById('inputHideName').checked = savedDraft.hideName;
+  if (savedDraft.bizName) bizNameInput.value = savedDraft.bizName;
+  if (savedDraft.bizCategory) bizCategoryInput.value = savedDraft.bizCategory;
+  if (savedDraft.bizDesc) bizDescInput.value = savedDraft.bizDesc;
+  if (savedDraft.bizLink) bizLinkInput.value = savedDraft.bizLink;
+  if (savedDraft.txId) txIdInput.value = savedDraft.txId;
+
+  // Restaura o modal do plano ativo caso o usuário tenha fechado/atualizado a página no meio do Pix
+  const activePlan = JSON.parse(localStorage.getItem('lixo_eletronico_active_plan') || 'null');
+  if (activePlan && (Date.now() - activePlan.timestamp < 3600000)) {
+    window.openAdModalWithPrice(activePlan.amount, activePlan.title);
+  }
+
+  const saveDraftFields = () => {
+    const draftData = {
+      userName: document.getElementById('inputUserName').value,
+      hideName: document.getElementById('inputHideName').checked,
+      bizName: bizNameInput.value,
+      bizCategory: bizCategoryInput.value,
+      bizDesc: bizDescInput.value,
+      bizLink: bizLinkInput.value,
+      txId: txIdInput.value
+    };
+    localStorage.setItem('lixo_eletronico_draft', JSON.stringify(draftData));
+  };
+
   const closeModalAction = () => {
     adModal.style.display = 'none';
     document.getElementById('pixDataForm').reset();
     txIdInput.value = '';
     receiptInput.value = '';
     btnVerifyPix.disabled = true;
+    localStorage.removeItem('lixo_eletronico_active_plan');
+    localStorage.removeItem('lixo_eletronico_draft');
   };
 
   if (btnCloseAd) btnCloseAd.addEventListener('click', closeModalAction);
@@ -722,11 +762,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (receiptInput) receiptInput.addEventListener('change', checkPixAndFormInputs);
   if (bizImageInput) bizImageInput.addEventListener('change', checkPixAndFormInputs);
-  if (txIdInput) txIdInput.addEventListener('input', checkPixAndFormInputs);
-  if (bizNameInput) bizNameInput.addEventListener('input', checkPixAndFormInputs);
-  if (bizCategoryInput) bizCategoryInput.addEventListener('input', checkPixAndFormInputs);
-  if (bizDescInput) bizDescInput.addEventListener('input', checkPixAndFormInputs);
-  if (bizLinkInput) bizLinkInput.addEventListener('input', checkPixAndFormInputs);
+  if (txIdInput) {
+    txIdInput.addEventListener('input', () => {
+      saveDraftFields();
+      checkPixAndFormInputs();
+    });
+  }
+  if (bizNameInput) {
+    bizNameInput.addEventListener('input', () => {
+      saveDraftFields();
+      checkPixAndFormInputs();
+    });
+  }
+  if (bizCategoryInput) {
+    bizCategoryInput.addEventListener('input', () => {
+      saveDraftFields();
+      checkPixAndFormInputs();
+    });
+  }
+  if (bizDescInput) {
+    bizDescInput.addEventListener('input', () => {
+      saveDraftFields();
+      checkPixAndFormInputs();
+    });
+  }
+  if (bizLinkInput) {
+    bizLinkInput.addEventListener('input', () => {
+      saveDraftFields();
+      checkPixAndFormInputs();
+    });
+  }
+  document.getElementById('inputUserName').addEventListener('input', saveDraftFields);
+  document.getElementById('inputHideName').addEventListener('change', saveDraftFields);
 
   const sponsorsGrid = document.getElementById('sponsorsGrid');
   const footerSponsorsGrid = document.getElementById('footerSponsorsGrid');
@@ -859,7 +926,11 @@ document.addEventListener('DOMContentLoaded', () => {
       let currentAds = JSON.parse(localStorage.getItem('lixo_eletronico_ads') || '[]');
       currentAds = currentAds.filter(ad => ad.expiresAt > now);
 
-      if (Number(selectedPlanAmount) === 115.00) {
+      // Garante que o valor pago corresponde ao plano travado no storage (anti-burla)
+      const lockedPlan = JSON.parse(localStorage.getItem('lixo_eletronico_active_plan') || 'null');
+      const finalPlanAmount = lockedPlan ? lockedPlan.amount : selectedPlanAmount;
+
+      if (Number(finalPlanAmount) === 115.00) {
         const existingVip = currentAds.find(a => Number(a.planAmount) === 115.00);
         if (existingVip) {
           alert('O espaço VIP acabou de ser ocupado por outro pagamento.');
@@ -868,9 +939,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      const txExists = currentAds.some(a => a.txId === txId);
+      // Verifica duplicidade de ID tanto nos anúncios ativos quanto no histórico permanente
+      let historicoPermanente = JSON.parse(localStorage.getItem('lixo_eletronico_historico_permanente') || '[]');
+      const txExists = currentAds.some(a => a.txId === txId) || historicoPermanente.some(h => h.txId === txId);
       if (txExists) {
-        alert('Este ID de transação Pix já foi utilizado recentemente.');
+        alert('Este ID de transação Pix já foi utilizado anteriormente.');
         return;
       }
 
@@ -901,7 +974,7 @@ document.addEventListener('DOMContentLoaded', () => {
           link,
           image: imgData,
           txId,
-          planAmount: selectedPlanAmount,
+          planAmount: finalPlanAmount,
           daysActive: totalDays,
           createdAt: now,
           expiresAt: expiresAt,
@@ -909,18 +982,21 @@ document.addEventListener('DOMContentLoaded', () => {
           expiresDateFormatted
         };
 
-        if (Number(selectedPlanAmount) === 115.00) {
+        if (Number(finalPlanAmount) === 115.00) {
           currentAds = currentAds.filter(a => Number(a.planAmount) !== 115.00);
         }
         currentAds.unshift(adData);
         localStorage.setItem('lixo_eletronico_ads', JSON.stringify(currentAds));
 
-        let historicoPermanente = JSON.parse(localStorage.getItem('lixo_eletronico_historico_permanente') || '[]');
         historicoPermanente.unshift({
           ...adData,
           registradoEm: new Date().toLocaleString('pt-BR')
         });
         localStorage.setItem('lixo_eletronico_historico_permanente', JSON.stringify(historicoPermanente));
+
+        // Limpa a trava e o rascunho após publicação concluída com sucesso
+        localStorage.removeItem('lixo_eletronico_active_plan');
+        localStorage.removeItem('lixo_eletronico_draft');
 
         renderPortal();
 
@@ -936,4 +1012,4 @@ document.addEventListener('DOMContentLoaded', () => {
       compressImage(imgFile, saveAd);
     });
   }
-});S
+});
