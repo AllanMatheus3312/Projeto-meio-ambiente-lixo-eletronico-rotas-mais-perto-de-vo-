@@ -1,13 +1,5 @@
 const eWastePlaces = [
   {
-    id: 15,
-    name: "PEV CMTU Zona Leste",
-    address: "Rua Capitão João Busse, 1285 - Jardim Califórnia, Londrina - PR",
-    hours: "Seg a Sex 08h-17h | Sáb 08h-12h",
-    lat: -23.3275,
-    lng: -51.1412
-  },
-  {
     id: 1,
     name: "ONG E-Letro (CRC Londrina)",
     address: "Rua Ermelindo Leão, 385 - Vila Casoni, Londrina - PR",
@@ -20,8 +12,8 @@ const eWastePlaces = [
     name: "Green Ocean / GD7 Metais Lixo Eletrônico",
     address: "Av. Alexandre Santoro, 590 - Jardim dos Estados, Londrina - PR",
     hours: "Seg a Sex 08h-18h",
-    lat: -23.3320,
-    lng: -51.1150
+    lat: -23.3150,
+    lng: -51.1210
   },
   {
     id: 3,
@@ -120,6 +112,14 @@ const eWastePlaces = [
     lng: -51.1710
   },
   {
+    id: 15,
+    name: "PEV CMTU Zona Leste",
+    address: "Rua Capitão João Busse, 1285 - Jardim Califórnia, Londrina - PR",
+    hours: "Seg a Sex 08h-17h | Sáb 08h-12h",
+    lat: -23.3275,
+    lng: -51.1412
+  },
+  {
     id: 16,
     name: "PEV CMTU Zona Norte",
     address: "Rua Anníbal Balarotti, s/n - Jardim Vista Bela, Londrina - PR",
@@ -196,6 +196,10 @@ function drawRouteToPlace(destLat, destLng, placeName) {
       L.latLng(originLat, originLng),
       L.latLng(destLat, destLng)
     ],
+    router: new L.Routing.OSRMv1({
+      serviceUrl: 'https://router.project-osrm.org/route/v1',
+      profile: 'driving'
+    }),
     routeWhileDragging: false,
     addWaypoints: false,
     draggableWaypoints: false,
@@ -221,15 +225,64 @@ function initMap() {
   }).addTo(map);
 
   markersGroup = L.featureGroup().addTo(map);
-  plotMarkers(eWastePlaces);
-  renderPlacesList(eWastePlaces);
+
+  // EXECUÇÃO IMEDIATA DA GEOLOCALIZAÇÃO AO ABRIR O MAPA
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        userLocation = { lat, lng };
+
+        if (!userMarker) {
+          const userIcon = L.divIcon({
+            className: 'user-location-marker',
+            html: `
+              <div style="display:flex; flex-direction:column; align-items:center; transform:translate(-50%, -100%);">
+                <div class="map-label-user">Você está aqui</div>
+                <i class="fa-solid fa-circle-dot" style="font-size:26px; color:#0284c7; background:#fff; border-radius:50%; filter:drop-shadow(0 2px 5px rgba(0,0,0,0.45));"></i>
+              </div>
+            `,
+            iconSize: [0, 0],
+            iconAnchor: [0, 0]
+          });
+          userMarker = L.marker([lat, lng], { icon: userIcon }).addTo(map);
+          userMarker.bindPopup("<b>Você está aqui!</b>");
+        }
+
+        const sortedPlaces = eWastePlaces.map(place => {
+          const dist = calculateDistance(lat, lng, place.lat, place.lng);
+          return { ...place, distance: dist };
+        }).sort((a, b) => a.distance - b.distance);
+
+        plotMarkers(sortedPlaces);
+        renderPlacesList(sortedPlaces);
+
+        const closest = sortedPlaces[0];
+        drawRouteToPlace(closest.lat, closest.lng, closest.name);
+
+        const statusMsg = document.getElementById('statusMessage');
+        if (statusMsg) {
+          statusMsg.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#10b981;"></i> Ponto mais próximo encontrado para você: <strong>${closest.name}</strong> (${closest.distance.toFixed(1)} km).`;
+        }
+      },
+      () => {
+        plotMarkers(eWastePlaces);
+        renderPlacesList(eWastePlaces);
+      },
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+    );
+  } else {
+    plotMarkers(eWastePlaces);
+    renderPlacesList(eWastePlaces);
+  }
 }
 
 function plotMarkers(places) {
   markersGroup.clearLayers();
 
   places.forEach((place, index) => {
-    const isNearest = (index === 0 && place.distance);
+    const isNearest = (index === 0 && place.distance !== undefined);
     const pinColor = isNearest ? '#10b981' : '#ef4444';
     const labelHtml = isNearest 
       ? `<div class="map-label-nearest">Descarte Eletrônico • Mais Próximo (${place.distance.toFixed(1)} km)</div>` 
@@ -250,7 +303,7 @@ function plotMarkers(places) {
     const marker = L.marker([place.lat, place.lng], { icon: pinIcon });
     const googleMapsRouteUrl = getGoogleMapsRouteUrl(place);
 
-    const distText = place.distance ? `<br><b>Distância:</b> ${place.distance.toFixed(2)} km` : '';
+    const distText = place.distance !== undefined ? `<br><b>Distância:</b> ${place.distance.toFixed(2)} km` : '';
     const nearestLabel = isNearest ? '<br><span style="color:#059669; font-weight:bold;">★ PONTO MAIS PRÓXIMO</span>' : '<br><span style="color:#dc2626; font-weight:bold;">Ponto de Coleta</span>';
     
     marker.bindPopup(`
@@ -288,8 +341,8 @@ function renderPlacesList(places) {
     const card = document.createElement('div');
     card.className = 'place-card';
     
-    const badgeNearest = (index === 0 && place.distance) ? '<span class="badge-nearest"><i class="fa-solid fa-star"></i> Mais Próximo</span>' : '';
-    const distText = place.distance ? `<span class="dist-tag"><i class="fa-solid fa-route"></i> ${place.distance.toFixed(1)} km</span>` : '';
+    const badgeNearest = (index === 0 && place.distance !== undefined) ? '<span class="badge-nearest"><i class="fa-solid fa-star"></i> Mais Próximo</span>' : '';
+    const distText = place.distance !== undefined ? `<span class="dist-tag"><i class="fa-solid fa-route"></i> ${place.distance.toFixed(1)} km</span>` : '';
     const googleMapsUrl = getGoogleMapsRouteUrl(place);
 
     card.innerHTML = `
@@ -336,7 +389,7 @@ function getUserLocation() {
     return;
   }
 
-  statusMsg.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Obtendo sua localização e traçando rota...';
+  statusMsg.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Obtendo sua localização e ordenando por proximidade...';
 
   navigator.geolocation.getCurrentPosition(
     (position) => {
@@ -372,10 +425,10 @@ function getUserLocation() {
 
       const closest = sortedPlaces[0];
       drawRouteToPlace(closest.lat, closest.lng, closest.name);
-      statusMsg.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#10b981;"></i> Rota automática iniciada para o ponto mais próximo: <strong>${closest.name}</strong> (${closest.distance.toFixed(1)} km).`;
+      statusMsg.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#10b981;"></i> Ponto mais próximo calculado com sucesso: <strong>${closest.name}</strong> (${closest.distance.toFixed(1)} km).`;
     },
     (error) => {
-      statusMsg.innerHTML = "Não foi possível obter sua localização no navegador. Clique em 'Iniciar Rota Aqui' em qualquer ponto abaixo para traçar a partir do Centro.";
+      statusMsg.innerHTML = "Não foi possível obter sua localização no navegador. Exibindo lista padrão.";
     },
     { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
   );
@@ -409,7 +462,6 @@ function handleSearch() {
   statusMsg.innerHTML = `Encontrado(s) <strong>${filtered.length}</strong> ponto(s) para "<em>${query}</em>".`;
 }
 
-// CHAVE PIX ALEATÓRIA SEGURA E PRIVADA DEFINIDA PELO USUÁRIO
 const PIX_KEY = "5fdeb776-815b-451b-95b5-8bda4ac82dfa";
 let selectedPlanAmount = "35.00";
 let globalVipAd = null;
