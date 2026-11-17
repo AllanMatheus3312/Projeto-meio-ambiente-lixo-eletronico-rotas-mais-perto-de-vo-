@@ -1,5 +1,13 @@
 const eWastePlaces = [
   {
+    id: 15,
+    name: "PEV CMTU Zona Leste",
+    address: "Rua Capitão João Busse, 1285 - Jardim Califórnia, Londrina - PR",
+    hours: "Seg a Sex 08h-17h | Sáb 08h-12h",
+    lat: -23.3275,
+    lng: -51.1412
+  },
+  {
     id: 1,
     name: "ONG E-Letro (CRC Londrina)",
     address: "Rua Ermelindo Leão, 385 - Vila Casoni, Londrina - PR",
@@ -12,8 +20,8 @@ const eWastePlaces = [
     name: "Green Ocean / GD7 Metais Lixo Eletrônico",
     address: "Av. Alexandre Santoro, 590 - Jardim dos Estados, Londrina - PR",
     hours: "Seg a Sex 08h-18h",
-    lat: -23.3150,
-    lng: -51.1210
+    lat: -23.3320,
+    lng: -51.1150
   },
   {
     id: 3,
@@ -25,8 +33,8 @@ const eWastePlaces = [
   },
   {
     id: 4,
-    name: "Catador Eletrônico (Cambé)",
-    address: "Rua Roberto Romanelli, 2761 - Cambé - PR",
+    name: "Catador Eletrônico",
+    address: "Rua Roberto Romanelli, 2761 - Centro, Cambé - PR",
     hours: "Seg a Sex 08h-17h",
     lat: -23.2785,
     lng: -51.2780
@@ -110,14 +118,6 @@ const eWastePlaces = [
     hours: "Seg a Sex 08h-18h",
     lat: -23.2950,
     lng: -51.1710
-  },
-  {
-    id: 15,
-    name: "PEV CMTU Zona Leste",
-    address: "Rua Capitão João Busse, 1285 - Jardim Califórnia, Londrina - PR",
-    hours: "Seg a Sex 08h-17h | Sáb 08h-12h",
-    lat: -23.3275,
-    lng: -51.1412
   },
   {
     id: 16,
