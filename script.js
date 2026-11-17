@@ -409,7 +409,8 @@ function handleSearch() {
   statusMsg.innerHTML = `Encontrado(s) <strong>${filtered.length}</strong> ponto(s) para "<em>${query}</em>".`;
 }
 
-const PIX_KEY = "254d5227-0a94-4950-9da0-c1ac36dac043";
+// CHAVE PIX ALEATÓRIA SEGURA E PRIVADA DEFINIDA PELO USUÁRIO
+const PIX_KEY = "5fdeb776-815b-451b-95b5-8bda4ac82dfa";
 let selectedPlanAmount = "35.00";
 let globalVipAd = null;
 
@@ -863,7 +864,6 @@ document.addEventListener('DOMContentLoaded', () => {
         currentAds.unshift(adData);
         localStorage.setItem('lixo_eletronico_ads', JSON.stringify(currentAds));
 
-        // HISTÓRICO PERMANENTE DE SEGURANÇA E AUDITORIA COMERCIAL
         let historicoPermanente = JSON.parse(localStorage.getItem('lixo_eletronico_historico_permanente') || '[]');
         historicoPermanente.unshift({
           ...adData,
