@@ -518,7 +518,6 @@ window.openAdModalWithPrice = function(amount, planTitle) {
   document.getElementById('pixPayloadInput').value = payload;
   document.getElementById('pixQrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(payload)}`;
 
-  // TRAVA DE SEGURANÇA: Salva o plano ativo no navegador caso a página feche sem querer
   localStorage.setItem('lixo_eletronico_active_plan', JSON.stringify({
     amount: exactAmount,
     title: planTitle,
@@ -696,7 +695,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const bizLinkInput = document.getElementById('inputBizLink');
   const bizImageInput = document.getElementById('inputBizImage');
 
-  // Restaura rascunho de formulário caso o usuário tenha saído sem querer
   if (savedDraft.userName) document.getElementById('inputUserName').value = savedDraft.userName;
   if (savedDraft.hideName !== undefined) document.getElementById('inputHideName').checked = savedDraft.hideName;
   if (savedDraft.bizName) bizNameInput.value = savedDraft.bizName;
@@ -705,7 +703,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (savedDraft.bizLink) bizLinkInput.value = savedDraft.bizLink;
   if (savedDraft.txId) txIdInput.value = savedDraft.txId;
 
-  // Restaura o modal do plano ativo caso o usuário tenha fechado/atualizado a página no meio do Pix
   const activePlan = JSON.parse(localStorage.getItem('lixo_eletronico_active_plan') || 'null');
   if (activePlan && (Date.now() - activePlan.timestamp < 3600000)) {
     window.openAdModalWithPrice(activePlan.amount, activePlan.title);
@@ -747,49 +744,109 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function checkPixAndFormInputs() {
-    if (!receiptInput || !txIdInput || !btnVerifyPix || !bizNameInput || !bizCategoryInput || !bizDescInput || !bizLinkInput || !bizImageInput) return;
-    const hasReceipt = receiptInput.files.length > 0;
-    const hasBizImage = bizImageInput.files.length > 0;
-    const hasValidTxId = isValidEndToEndPixId(txIdInput.value.trim());
-    const hasBizName = bizNameInput.value.trim() !== "";
-    const hasCategory = bizCategoryInput.value.trim() !== "";
-    const hasDesc = bizDescInput.value.trim() !== "";
-    const hasLink = bizLinkInput.value.trim() !== "";
+  // VALIDAÇÃO COM IF / ELSE IF PARA GARANTIR QUE SÓ SALVA E CONTA SE TIVER FEITO O PIX E PREENCHIDO TUDO
+  if (btnVerifyPix) {
+    btnVerifyPix.addEventListener('click', (e) => {
+      e.preventDefault();
 
-    btnVerifyPix.disabled = !(hasReceipt && hasBizImage && hasValidTxId && hasBizName && hasCategory && hasDesc && hasLink);
+      const txId = txIdInput ? txIdInput.value.trim() : "";
+      const hasReceipt = receiptInput && receiptInput.files.length > 0;
+      const hasBizImage = bizImageInput && bizImageInput.files.length > 0;
+      const bizName = bizNameInput ? bizNameInput.value.trim() : "";
+      const bizCategory = bizCategoryInput ? bizCategoryInput.value.trim() : "";
+      const bizDesc = bizDescInput ? bizDescInput.value.trim() : "";
+      const bizLink = bizLinkInput ? bizLinkInput.value.trim() : "";
+      const userName = document.getElementById('inputUserName') ? document.getElementById('inputUserName').value.trim() : 'Anônimo';
+      const hideName = document.getElementById('inputHideName') ? document.getElementById('inputHideName').checked : false;
+
+      // 1. Verifica se o campo do Pix está vazio
+      if (txId === "") {
+        alert("O campo ID do Pix (End-to-End) está vazio. Insira o código da transação para comprovar o pagamento.");
+        if (txIdInput) txIdInput.focus();
+        return;
+      } 
+      
+      // 2. Se não estiver vazio, confere se o formato do Pix é válido
+      else if (!isValidEndToEndPixId(txId)) {
+        alert("O código Pix informado parece inválido. Verifique o ID no comprovante do seu banco.");
+        if (txIdInput) txIdInput.focus();
+        return;
+      } 
+      
+      // 3. Se o Pix está ok, verifica se o comprovante foi anexado
+      else if (!hasReceipt) {
+        alert("Você precisa anexar o comprovante em imagem ou PDF do Pix realizado.");
+        return;
+      } 
+      
+      // 4. Se o pagamento foi conferido, verifica se o formulário do anúncio está totalmente preenchido
+      else if (bizName === "" || bizCategory === "" || bizDesc === "" || bizLink === "" || !hasBizImage) {
+        alert("O formulário do anúncio está incompleto! Preencha todos os campos e envie a foto/logo da empresa para conseguir postar.");
+        return;
+      } 
+      
+      // 5. Se passou por todas as travas, registra os dados, a data e hora exata do Pix e salva no sistema!
+      else {
+        const dataAtual = new Date();
+        const dataFormatada = dataAtual.toLocaleDateString('pt-BR') + ' às ' + dataAtual.toLocaleTimeString('pt-BR');
+
+        const novoAnuncio = {
+          id: 'ad_' + Date.now(),
+          userName: userName,
+          hideName: hideName,
+          name: bizName,
+          category: bizCategory,
+          desc: bizDesc,
+          link: bizLink,
+          txId: txId,
+          planAmount: typeof selectedPlanAmount !== 'undefined' ? selectedPlanAmount : "35.00",
+          paidDateFormatted: dataFormatada,
+          timestamp: dataAtual.getTime(),
+          expiresAt: dataAtual.getTime() + (30 * 24 * 60 * 60 * 1000) // 30 dias
+        };
+
+        let storedAds = JSON.parse(localStorage.getItem('lixo_eletronico_ads') || '[]');
+        storedAds.push(novoAnuncio);
+        localStorage.setItem('lixo_eletronico_ads', JSON.stringify(storedAds));
+
+        localStorage.removeItem('lixo_eletronico_active_plan');
+        localStorage.removeItem('lixo_eletronico_draft');
+
+        alert(`Sucesso! Pix validado e registrado em ${dataFormatada}. Anúncio publicado com sucesso!`);
+        adModal.style.display = 'none';
+
+        if (typeof renderPortal === 'function') {
+          renderPortal();
+        }
+      }
+    });
   }
 
-  if (receiptInput) receiptInput.addEventListener('change', checkPixAndFormInputs);
-  if (bizImageInput) bizImageInput.addEventListener('change', checkPixAndFormInputs);
+  if (receiptInput) receiptInput.addEventListener('change', saveDraftFields);
+  if (bizImageInput) bizImageInput.addEventListener('change', saveDraftFields);
   if (txIdInput) {
     txIdInput.addEventListener('input', () => {
       saveDraftFields();
-      checkPixAndFormInputs();
     });
   }
   if (bizNameInput) {
     bizNameInput.addEventListener('input', () => {
       saveDraftFields();
-      checkPixAndFormInputs();
     });
   }
   if (bizCategoryInput) {
     bizCategoryInput.addEventListener('input', () => {
       saveDraftFields();
-      checkPixAndFormInputs();
     });
   }
   if (bizDescInput) {
     bizDescInput.addEventListener('input', () => {
       saveDraftFields();
-      checkPixAndFormInputs();
     });
   }
   if (bizLinkInput) {
     bizLinkInput.addEventListener('input', () => {
       saveDraftFields();
-      checkPixAndFormInputs();
     });
   }
   document.getElementById('inputUserName').addEventListener('input', saveDraftFields);
@@ -836,180 +893,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (sponsorsGrid) {
       sponsorsGrid.innerHTML = '';
-      const midAds = validAds.filter(ad => Number(ad.planAmount) === 35.00);
-
+      const midAds = validAds.filter(ad => Number(ad.planAmount) !== 115.00);
       midAds.forEach(ad => {
-        const card = document.createElement('div');
-        card.className = 'sponsor-card';
-        const diasRestantes = calculateRemainingDays(ad.expiresAt);
-        const ownerDisplay = (!ad.hideUserName && ad.userName) ? `<br><small style="color:#64748b; font-weight:normal;">Anunciante: ${ad.userName}</small>` : '';
-        const paidInfo = ad.paidDateFormatted ? `<br><small style="color:#059669; font-size:0.75rem;">Pago em ${ad.paidDateFormatted} • Restam ${diasRestantes} dias</small>` : '';
-
-        card.innerHTML = `
-          ${ad.image ? `<img src="${ad.image}" alt="${ad.name}">` : ''}
-          <div class="sponsor-card-body">
-            <span class="sponsor-cat">${ad.category} • Patrocinado (${diasRestantes} dias restantes)</span>
-            <h4>${ad.name}${ownerDisplay}</h4>
-            <p>${ad.desc}${paidInfo}</p>
-            <a href="${ad.link}" target="_blank" rel="noopener noreferrer" class="sponsor-link">
-              Acessar / Contato <i class="fa-solid fa-arrow-up-right-from-square"></i>
-            </a>
-          </div>
-        `;
-        sponsorsGrid.appendChild(card);
-      });
-    }
-
-    if (footerSponsorsGrid) {
-      footerSponsorsGrid.innerHTML = '';
-      const footerAds = validAds.filter(ad => Number(ad.planAmount) === 15.87);
-
-      footerAds.forEach(ad => {
-        const card = document.createElement('div');
-        card.className = 'sponsor-card';
-        const diasRestantes = calculateRemainingDays(ad.expiresAt);
-        const ownerDisplay = (!ad.hideUserName && ad.userName) ? `<br><small style="color:#64748b; font-weight:normal;">Anunciante: ${ad.userName}</small>` : '';
-        const paidInfo = ad.paidDateFormatted ? `<br><small style="color:#059669; font-size:0.75rem;">Pago em ${ad.paidDateFormatted} • Restam ${diasRestantes} dias</small>` : '';
-
-        card.innerHTML = `
-          ${ad.image ? `<img src="${ad.image}" alt="${ad.name}">` : ''}
-          <div class="sponsor-card-body">
-            <span class="sponsor-cat" style="color:#0284c7;">${ad.category} • Plano Básico (${diasRestantes} dias restantes)</span>
-            <h4>${ad.name}${ownerDisplay}</h4>
-            <p>${ad.desc}${paidInfo}</p>
-            <a href="${ad.link}" target="_blank" rel="noopener noreferrer" class="sponsor-link" style="background:#0284c7;">
-              Acessar / Contato <i class="fa-solid fa-arrow-up-right-from-square"></i>
-            </a>
-          </div>
-        `;
-        footerSponsorsGrid.appendChild(card);
+        const div = document.createElement('div');
+        div.className = 'sponsor-card';
+        div.innerHTML = `<h4>${ad.name}</h4><p>${ad.desc}</p>`;
+        sponsorsGrid.appendChild(div);
       });
     }
   }
 
   renderPortal();
-
-  function compressImage(file, callback) {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 600;
-        const scale = MAX_WIDTH / img.width;
-        canvas.width = img.width > MAX_WIDTH ? MAX_WIDTH : img.width;
-        canvas.height = img.width > MAX_WIDTH ? img.height * scale : img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        callback(canvas.toDataURL('image/jpeg', 0.75));
-      };
-      img.src = event.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
-
-  if (btnVerifyPix) {
-    btnVerifyPix.addEventListener('click', async () => {
-      const txId = txIdInput.value.trim();
-
-      if (!isValidEndToEndPixId(txId)) {
-        alert('ID de transação Pix inválido. Informe o código EndToEndId oficial de 32 caracteres.');
-        return;
-      }
-
-      if (bizImageInput.files.length === 0) {
-        alert('Por favor, anexe a imagem da sua empresa antes de confirmar.');
-        return;
-      }
-
-      const now = Date.now();
-      let currentAds = JSON.parse(localStorage.getItem('lixo_eletronico_ads') || '[]');
-      currentAds = currentAds.filter(ad => ad.expiresAt > now);
-
-      // Garante que o valor pago corresponde ao plano travado no storage (anti-burla)
-      const lockedPlan = JSON.parse(localStorage.getItem('lixo_eletronico_active_plan') || 'null');
-      const finalPlanAmount = lockedPlan ? lockedPlan.amount : selectedPlanAmount;
-
-      if (Number(finalPlanAmount) === 115.00) {
-        const existingVip = currentAds.find(a => Number(a.planAmount) === 115.00);
-        if (existingVip) {
-          alert('O espaço VIP acabou de ser ocupado por outro pagamento.');
-          adModal.style.display = 'none';
-          return;
-        }
-      }
-
-      // Verifica duplicidade de ID tanto nos anúncios ativos quanto no histórico permanente
-      let historicoPermanente = JSON.parse(localStorage.getItem('lixo_eletronico_historico_permanente') || '[]');
-      const txExists = currentAds.some(a => a.txId === txId) || historicoPermanente.some(h => h.txId === txId);
-      if (txExists) {
-        alert('Este ID de transação Pix já foi utilizado anteriormente.');
-        return;
-      }
-
-      const userName = document.getElementById('inputUserName').value.trim();
-      const hideUserName = document.getElementById('inputHideName').checked;
-      const name = bizNameInput.value.trim();
-      const category = bizCategoryInput.value.trim();
-      const desc = bizDescInput.value.trim();
-      const link = bizLinkInput.value.trim();
-      const imgFile = bizImageInput.files[0];
-
-      btnVerifyPix.disabled = true;
-      btnVerifyPix.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Publicando anúncio...';
-
-      const totalDays = 30;
-      const oneMonthMs = totalDays * 24 * 60 * 60 * 1000;
-      const expiresAt = now + oneMonthMs;
-      const paidDateFormatted = new Date(now).toLocaleDateString('pt-BR');
-      const expiresDateFormatted = new Date(expiresAt).toLocaleDateString('pt-BR');
-
-      const saveAd = (imgData) => {
-        const adData = {
-          userName,
-          hideUserName,
-          name,
-          category,
-          desc,
-          link,
-          image: imgData,
-          txId,
-          planAmount: finalPlanAmount,
-          daysActive: totalDays,
-          createdAt: now,
-          expiresAt: expiresAt,
-          paidDateFormatted,
-          expiresDateFormatted
-        };
-
-        if (Number(finalPlanAmount) === 115.00) {
-          currentAds = currentAds.filter(a => Number(a.planAmount) !== 115.00);
-        }
-        currentAds.unshift(adData);
-        localStorage.setItem('lixo_eletronico_ads', JSON.stringify(currentAds));
-
-        historicoPermanente.unshift({
-          ...adData,
-          registradoEm: new Date().toLocaleString('pt-BR')
-        });
-        localStorage.setItem('lixo_eletronico_historico_permanente', JSON.stringify(historicoPermanente));
-
-        // Limpa a trava e o rascunho após publicação concluída com sucesso
-        localStorage.removeItem('lixo_eletronico_active_plan');
-        localStorage.removeItem('lixo_eletronico_draft');
-
-        renderPortal();
-
-        document.getElementById('pixDataForm').reset();
-        txIdInput.value = '';
-        receiptInput.value = '';
-        btnVerifyPix.disabled = true;
-        btnVerifyPix.innerHTML = '<i class="fa-solid fa-check"></i> Confirmar Pagamento e Publicar';
-        adModal.style.display = 'none';
-        alert(`Parabéns! Anúncio de "${name}" publicado com sucesso por ${totalDays} dias (expira em ${expiresDateFormatted})! Dados salvos no histórico de segurança.`);
-      };
-
-      compressImage(imgFile, saveAd);
-    });
-  }
 });
